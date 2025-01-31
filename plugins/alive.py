@@ -4,30 +4,19 @@ import config
 import time
 import sys
 import telethon
+import platform  # ✅ Fixed import
 
-# Alive message plugin
-@client.on(events.NewMessage(pattern=f"^{config.CMD_HNDLR}alive"))
+@client.on(events.NewMessage(pattern=r"^.alive$", outgoing=True))
 async def alive(event):
-    uptime = time.time() - client.start_time  # Calculate uptime
-    uptime_str = f"{int(uptime // 3600)}h {int((uptime % 3600) // 60)}m {int(uptime % 60)}s"
-    
-    # Get Python and Telethon version
-    python_version = sys.version.split(" ")[0]  # Get Python version (e.g., 3.9.1)
-    telethon_version = telethon.__version__  # Get Telethon version
-    
-    alive_text = f"""
-    ᴄʏʙᴇʀɴᴇxᴜs | ᴏɴʟɪɴᴇ 🌐
+    cyber_alive_text = (
+        "🌐 **ᴄʏʙᴇʀɴᴇxᴜs | ᴏɴʟɪɴᴇ** 🌐\n\n"
+        f"✵ **Owner:** {config.DEPLOYER_NAME} 👑\n"
+        "✵ **Nexus:** v1.0\n"
+        "✵ **Py-Nexus:** 2025\n"
+        "✵ **Uptime:** Aʟɪᴠᴇ & ᴡᴇʟʟ ⏳\n"
+        f"✵ **Python:** v{platform.python_version()} 🐍\n"
+        f"✵ **Telethon:** v{telethon.__version__} 📡\n"
+        "✵ **Branch:** main ⚙️"
+    )
 
-    ✵ **Owner - {config.DEPLOYER_NAME} 👑**  
-    ✵ **Nexus:** v1.0  
-    ✵ **Py-Nexus:** 2025  
-    ✵ **Uptime:** Aʟɪᴠᴇ & ᴡᴇʟʟ ⏳  
-    ✵ **Python:** v {python_version} 🐍  
-    ✵ **Telethon:** v {telethon_version} 📡  
-    ✵ **Branch:** master ⚙️
-    
-    ⏱️ **Uptime:** {uptime_str}
-    """
-    
-    # Edit the command message instead of sending a new one
-    await event.edit(alive_text)
+    await event.edit(cyber_alive_text)
