@@ -14,9 +14,6 @@ async def start_bot():
     await client.start()
     print("✅ CyberNexus Userbot is Online!")
     
-    # Set custom bio/status message (optional)
-    await client(UpdateProfileRequest(about="ᴄʏʙᴇʀɴᴇxᴜs | ᴏɴʟɪɴᴇ 🌐"))
-
 # Event handler for `.alive` command
 @client.on(events.NewMessage(pattern=r"^.alive$", outgoing=True))
 async def alive(event):
