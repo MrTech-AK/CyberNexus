@@ -22,9 +22,9 @@ async def alive(event):
     ✵ **Nexus:** v1.0  
     ✵ **Py-Nexus:** 2025  
     ✵ **Uptime:** Aʟɪᴠᴇ & ᴡᴇʟʟ ⏳  
-    ✵ **Python:** v{python_version} 🐍  
-    ✵ **Telethon:** v{telethon_version} 📡  
-    ✵ **Branch:** main ⚙️
+    ✵ **Python:** v {python_version} 🐍  
+    ✵ **Telethon:** v {telethon_version} 📡  
+    ✵ **Branch:** master ⚙️
     
     ⏱️ **Uptime:** {uptime_str}
     """
