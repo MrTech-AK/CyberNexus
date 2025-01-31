@@ -1,41 +1,39 @@
 from telethon import TelegramClient, events
-import config
-import os
-import importlib
+from telethon.sessions import StringSession  # Import StringSession
+import config  # Import config.py
 
-# Initialize the Telethon client
+# Initialize Telegram Client using StringSession
 client = TelegramClient(
-    session=config.STRING_SESSION, 
-    api_id=config.API_ID, 
+    session=StringSession(config.STRING_SESSION),  # Ensure StringSession is used
+    api_id=config.API_ID,
     api_hash=config.API_HASH
 )
 
-client.start_time = None  # Initialize uptime tracking
-
-# Load plugins dynamically
-async def load_plugins():
-    plugin_folder = "plugins"
-    if not os.path.exists(plugin_folder):
-        os.mkdir(plugin_folder)
-    
-    for file in os.listdir(plugin_folder):
-        if file.endswith(".py"):
-            plugin_name = file[:-3]  # Remove .py extension
-            importlib.import_module(f"plugins.{plugin_name}")  # Dynamically import plugins
-
-# Start the bot
+# Start the client
 async def start_bot():
     await client.start()
-    client.start_time = time.time()  # Store bot start time
-    print("CyberNexus Userbot is now running!")
-    await load_plugins()
-    await client.run_until_disconnected()
+    print("✅ CyberNexus Userbot is Online!")
+    
+    # Set custom bio/status message (optional)
+    await client(UpdateProfileRequest(about="ᴄʏʙᴇʀɴᴇxᴜs | ᴏɴʟɪɴᴇ 🌐"))
 
-# Event to confirm bot startup
-@client.on(events.NewMessage(pattern=f"^{config.CMD_HNDLR}start"))
-async def start_message(event):
-    await event.edit("CʏʙᴇʀNᴇxᴜs ɪs ɴᴏᴡ ᴏɴʟɪɴᴇ!")
+# Event handler for `.alive` command
+@client.on(events.NewMessage(pattern=r"^.alive$", outgoing=True))
+async def alive(event):
+    cyber_alive_text = (
+        "🌐 **ᴄʏʙᴇʀɴᴇxᴜs | ᴏɴʟɪɴᴇ** 🌐\n\n"
+        f"✵ **Owner:** {config.DEPLOYER_NAME} 👑\n"
+        "✵ **Nexus:** v1.0\n"
+        "✵ **Py-Nexus:** 2025\n"
+        "✵ **Uptime:** Aʟɪᴠᴇ & ᴡᴇʟʟ ⏳\n"
+        f"✵ **Python:** v{platform.python_version()} 🐍\n"
+        f"✵ **Telethon:** v{TelegramClient.__version__} 📡\n"
+        "✵ **Branch:** master ⚙️"
+    )
+
+    await event.edit(cyber_alive_text)  # Edit the command message instead of sending a new one
 
 # Run the bot
-if __name__ == "__main__":
+with client:
     client.loop.run_until_complete(start_bot())
+    client.run_until_disconnected()
