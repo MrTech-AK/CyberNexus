@@ -1,10 +1,13 @@
+import os
+import platform
+import importlib
 from telethon import TelegramClient, events
-from telethon.sessions import StringSession  # Import StringSession
-import config  # Import config.py
+from telethon.sessions import StringSession
+import config  # Import configuration file
 
 # Initialize Telegram Client using StringSession
 client = TelegramClient(
-    session=StringSession(config.STRING_SESSION),  # Ensure StringSession is used
+    session=StringSession(config.STRING_SESSION),
     api_id=config.API_ID,
     api_hash=config.API_HASH
 )
@@ -13,24 +16,18 @@ client = TelegramClient(
 async def start_bot():
     await client.start()
     print("✅ CyberNexus Userbot is Online!")
-    
-# Event handler for `.alive` command
-@client.on(events.NewMessage(pattern=r"^.alive$", outgoing=True))
-async def alive(event):
-    cyber_alive_text = (
-        "🌐 **ᴄʏʙᴇʀɴᴇxᴜs | ᴏɴʟɪɴᴇ** 🌐\n\n"
-        f"✵ **Owner:** {config.DEPLOYER_NAME} 👑\n"
-        "✵ **Nexus:** v1.0\n"
-        "✵ **Py-Nexus:** 2025\n"
-        "✵ **Uptime:** Aʟɪᴠᴇ & ᴡᴇʟʟ ⏳\n"
-        f"✵ **Python:** v{platform.python_version()} 🐍\n"
-        f"✵ **Telethon:** v{TelegramClient.__version__} 📡\n"
-        "✵ **Branch:** master ⚙️"
-    )
 
-    await event.edit(cyber_alive_text)  # Edit the command message instead of sending a new one
+# Auto-load all plugins from the "plugins" folder
+def load_plugins():
+    plugins_path = "plugins"
+    if not os.path.exists(plugins_path):
+        os.makedirs(plugins_path)  # Create folder if not exists
+    for filename in os.listdir(plugins_path):
+        if filename.endswith(".py"):
+            importlib.import_module(f"plugins.{filename[:-3]}")
 
 # Run the bot
 with client:
     client.loop.run_until_complete(start_bot())
+    load_plugins()  # Load all plugins
     client.run_until_disconnected()
