@@ -10,6 +10,8 @@ client = TelegramClient(
     api_hash=config.API_HASH
 )
 
+client.start_time = None  # Initialize uptime tracking
+
 # Load plugins dynamically
 async def load_plugins():
     plugin_folder = "plugins"
@@ -24,6 +26,7 @@ async def load_plugins():
 # Start the bot
 async def start_bot():
     await client.start()
+    client.start_time = time.time()  # Store bot start time
     print("CyberNexus Userbot is now running!")
     await load_plugins()
     await client.run_until_disconnected()
