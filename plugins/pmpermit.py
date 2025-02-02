@@ -7,6 +7,23 @@ import sys
 import telethon
 import platform
 
+@client.on(events.NewMessage(pattern=r"^\.pmpermit_help$", outgoing=True))
+async def pmpermit_help(event):
+    """Sends a help message explaining how to get approved and the rules."""
+    help_message = (
+        "📚 **PM Permit Help** 📚\n\n"
+        "Welcome to CyberNexus! Here's how to interact with me:\n\n"
+        "1. **Approve a user**: Use `.a` to approve a user and allow them to send messages freely.\n"
+        "2. **Disapprove a user**: Use `.d` to disapprove a user and restrict them from messaging.\n"
+        "3. **Block a user**: Use `.block <user_id>` to block a user from messaging you.\n"
+        "4. **Unblock a user**: Use `.unblock <user_id>` to unblock a previously blocked user.\n"
+        "5. **List approved users**: Use `.listapproved` to see all approved users.\n"
+        "6. **Unapproved messages**: Any unapproved users can send messages, but if they send 10 messages, they'll be blocked automatically.\n\n"
+        "🛑 **Important**: Spamming isn't cool! After 10 unapproved messages, you will be blocked automatically.\n\n"
+        "💡 **Pro Tip**: Be patient and stay cool—your message is important! 😎"
+    )
+    await event.edit(help_message)
+    
 # Store approved users & unapproved message counts
 approved_users = set()
 unapproved_counts = {}
@@ -87,12 +104,13 @@ async def monitor_unapproved_messages(event):
     # Send a warning message only for the first time
     if unapproved_counts[user] == 1:
         warning_message = (
-            "👋 **Hey there!**\n\n"
-            "You've reached CyberNexus, my owner's personal assistant.\n"
-            "I’ve just notified my master about your message—hang tight, a reply is on its way! 🚀\n\n"
-            "**⚠ Warning:** Spamming isn't cool—10 messages = instant block! 😬\n"
-            "Be patient, and you'll get the attention you deserve. 💬\n\n"
-            "× **Powered by CyberNexus**"
+"🌟 Hey there, Superstar! 🌟\n\n"
+"You've just connected with CyberNexus, the personal assistant of my owner! ✨\n"
+"I'm notifying them right now, so hang tight—your reply is coming soon! 🚀\n\n"
+"⚠️ Important: No spamming, please! 🚫 10 messages = Instant block! 😬\n"
+"Keep it chill, and you'll get the attention you deserve! 💬\n\n"
+"💡 Pro Tip: Patience pays off, and your message is worth it. 😎\n\n"
+"× Powered by CyberNexus 💻"
         )
         await event.respond(warning_message)
 
