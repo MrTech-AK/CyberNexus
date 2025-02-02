@@ -18,8 +18,6 @@ client = TelegramClient(
     api_hash=config.API_HASH
 )
 
-BOTFATHER_ID = 93372553  # Official BotFather ID
-
 
 # Cool Loading Animation
 def loading_animation(task, seconds=2):
@@ -41,71 +39,6 @@ def load_plugins():
             importlib.import_module(f"plugins.{filename[:-3]}")
             console.print(f"[bold cyan]📂 Loaded Plugin: {filename}[/bold cyan]")
 
-
-async def create_bot():
-    async with client.conversation("BotFather") as conv:
-        console.print("[bold yellow]🤖 Creating a new bot...[/bold yellow]")
-        loading_animation("Requesting BotFather", 3)
-
-        # Start the bot creation process by sending the '/newbot' command
-        await conv.send_message("/newbot")
-        await conv.get_response()
-
-        bot_name = "CyberNexus Contact Bot"  # Name for the new bot
-        await conv.send_message(bot_name)
-        await conv.get_response()
-
-        # Fetch the bot username dynamically from the config file (USERNAME entered by user)
-        bot_username = f"{config.USERNAME}_CyberNexus_Bot"  # Replace {USERNAME} with actual username
-        await conv.send_message(bot_username)
-        response = await conv.get_response()
-
-        # Handle the case where the bot username is already taken
-        if "Sorry" in response.text:
-            console.print("[bold red]⚠ Bot username already taken! Try again.[/bold red]")
-            return None
-
-        # Extract the bot token from the response
-        bot_token = response.text.split("Use this token to access the HTTP API:")[1].split("\n")[0].strip()
-        console.print(f"[bold green]✅ Bot Created Successfully! Token: {bot_token}[/bold green]")
-
-                # Save the bot token to the config.py file
-        with open("config.py", "a") as config_file:
-            config_file.write(f"\nBOT_TOKEN = '{bot_token}'\n")  # Append the BOT_TOKEN to config.py
-            
-        return bot_token
-
-
-async def configure_bot(bot_token):
-    async with client.conversation("BotFather") as conv:
-        console.print("[bold cyan]⚙ Configuring bot...[/bold cyan]")
-        loading_animation("Setting description", 2)
-
-        await conv.send_message(f"/setdescription {bot_token}")
-        await conv.get_response()
-        await conv.send_message("🤖 This is a CyberNexus-powered contact bot.")
-        await conv.get_response()
-
-        loading_animation("Updating bot info", 2)
-        await conv.send_message(f"/setabouttext {bot_token}")
-        await conv.get_response()
-        await conv.send_message("⚡ CyberNexus: The Future of Telegram Automation")
-        await conv.get_response()
-
-        loading_animation("Adding bot commands", 2)
-        await conv.send_message(f"/setcommands {bot_token}")
-        await conv.get_response()
-        await conv.send_message("start - Start the bot\nhelp - Get help")
-        await conv.get_response()
-
-        console.print("[bold green]✅ Bot Configuration Completed![/bold green]")
-
-
-async def run_contact_bot():
-    console.print("[bold blue]📩 Starting CyberNexus Contact Bot...[/bold blue]")
-    os.system("python contact_bot.py")  # Run the Contact Bot
-
-
 async def main():
     console.print("[bold blue]🔹 CyberNexus Userbot is Booting... 🔹[/bold blue]\n")
 
@@ -113,10 +46,6 @@ async def main():
 
     async with client:
         await start_bot()
-
-        bot_token = await create_bot()
-        if bot_token:
-            await configure_bot(bot_token)
 
         load_plugins()  # Load plugins
 
