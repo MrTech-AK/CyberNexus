@@ -12,6 +12,21 @@ warn_data = {}
 # Maximum warnings before auto-action
 MAX_WARNINGS = 3
 
+@client.on(events.NewMessage(pattern=r"^\.help_warn$", outgoing=True))
+async def help_warn(event):
+    """Displays a detailed help for the warning system."""
+    help_message = (
+        "**🚨 Warning System Help 🚨**\n\n"
+        "This system allows you to manage warnings for users in your group.\n\n"
+        "• `.warn` – Warn a user (reply to a message to warn the user).\n"
+        "• `.resetwarn` – Reset a user's warnings.\n"
+        "• `.warns` – Check the number of warnings a user has.\n"
+        "• `.setwarn <number>` – Set the maximum number of warnings before an auto-action is triggered (default is 3).\n\n"
+        "If a user exceeds the maximum warnings, they will be automatically kicked from the group.\n"
+        "Use `.warnhelp` to view this help message again."
+    )
+    await event.edit(help_message)
+    
 @client.on(events.NewMessage(pattern=r"^\.warn$", outgoing=True))
 async def warn_user(event):
     """Warns a user and takes action if they exceed max warnings."""
