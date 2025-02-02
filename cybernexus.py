@@ -47,21 +47,25 @@ async def create_bot():
         console.print("[bold yellow]🤖 Creating a new bot...[/bold yellow]")
         loading_animation("Requesting BotFather", 3)
 
+        # Start the bot creation process by sending the '/newbot' command
         await conv.send_message("/newbot")
         await conv.get_response()
 
-        bot_name = "CyberNexus Contact Bot"
+        bot_name = "CyberNexus Contact Bot"  # Name for the new bot
         await conv.send_message(bot_name)
         await conv.get_response()
 
-        bot_username = "{USERNAME}_CyberNexus_Bot"
+        # Fetch the bot username dynamically from the config file (USERNAME entered by user)
+        bot_username = f"{config.USERNAME}_CyberNexus_Bot"  # Replace {USERNAME} with actual username
         await conv.send_message(bot_username)
         response = await conv.get_response()
 
+        # Handle the case where the bot username is already taken
         if "Sorry" in response.text:
             console.print("[bold red]⚠ Bot username already taken! Try again.[/bold red]")
             return None
 
+        # Extract the bot token from the response
         bot_token = response.text.split("Use this token to access the HTTP API:")[1].split("\n")[0].strip()
         console.print(f"[bold green]✅ Bot Created Successfully! Token: {bot_token}[/bold green]")
 
