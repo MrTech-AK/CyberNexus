@@ -1,38 +1,33 @@
 import os
-import importlib
 import platform
+import importlib
 from telethon import TelegramClient, events
-import config
+from telethon.sessions import StringSession
+import config  # Import configuration file
 
-# CyberNexus Banner
-BANNER = f"""
-╔══════════════════════════════════════════════╗
-║                CYBERNEXUS USERBOT            
-╠══════════════════════════════════════════════╣
-║         Customizable, Fast, Secure           
-║   Running on: {platform.system()} {platform.release()} ({platform.architecture()[0]})  
-╚══════════════════════════════════════════════╝
-"""
-
-print(BANNER)
-
-# Initialize CyberNexus Client
-client = TelegramClient("cybernexus", config.API_ID, config.API_HASH).start(
-    session=config.STRING_SESSION
+# Initialize Telegram Client using StringSession
+client = TelegramClient(
+    session=StringSession(config.STRING_SESSION),
+    api_id=config.API_ID,
+    api_hash=config.API_HASH
 )
 
-# Plugin Loader
-def load_plugins():
-    plugin_path = "plugins"
-    for filename in os.listdir(plugin_path):
-        if filename.endswith(".py"):
-            importlib.import_module(f"{plugin_path}.{filename[:-3]}")
-            print(f"✅ Loaded plugin: {filename}")
+# Start the client
+async def start_bot():
+    await client.start()
+    print("✅ CyberNexus Userbot is Online!")
 
-# Run CyberNexus
-if __name__ == "__main__":
-    print(f"🔹 CyberNexus is starting on {platform.system()} {platform.release()}...")
-    load_plugins()
-    print("✅ All plugins loaded successfully!")
-    print("🚀 CyberNexus is now running!")
+# Auto-load all plugins from the "plugins" folder
+def load_plugins():
+    plugins_path = "plugins"
+    if not os.path.exists(plugins_path):
+        os.makedirs(plugins_path)  # Create folder if not exists
+    for filename in os.listdir(plugins_path):
+        if filename.endswith(".py"):
+            importlib.import_module(f"plugins.{filename[:-3]}")
+
+# Run the bot
+with client:
+    client.loop.run_until_complete(start_bot())
+    load_plugins()  # Load all plugins
     client.run_until_disconnected()
