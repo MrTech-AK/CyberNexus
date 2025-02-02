@@ -8,6 +8,13 @@ import config  # Import configuration file
 from rich.console import Console
 from rich.progress import track
 
+# Initialize Telegram Client using StringSession
+client = TelegramClient(
+    session=StringSession(config.STRING_SESSION),
+    api_id=config.API_ID,
+    api_hash=config.API_HASH
+)
+
 # Console Styling
 console = Console()
 
