@@ -69,6 +69,10 @@ async def create_bot():
         bot_token = response.text.split("Use this token to access the HTTP API:")[1].split("\n")[0].strip()
         console.print(f"[bold green]✅ Bot Created Successfully! Token: {bot_token}[/bold green]")
 
+                # Save the bot token to the config.py file
+        with open("config.py", "a") as config_file:
+            config_file.write(f"\nBOT_TOKEN = '{bot_token}'\n")  # Append the BOT_TOKEN to config.py
+            
         return bot_token
 
 
