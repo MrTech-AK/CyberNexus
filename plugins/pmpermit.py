@@ -7,7 +7,7 @@ import sys
 import telethon
 import platform
 
-@client.on(events.NewMessage(pattern=r"^\.pmpermit_help$", outgoing=True))
+@client.on(events.NewMessage(pattern=r"^\.help_pmpermit$", outgoing=True))
 async def pmpermit_help(event):
     """Sends a help message explaining how to get approved and the rules."""
     help_message = (
