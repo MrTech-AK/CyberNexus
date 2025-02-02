@@ -34,7 +34,7 @@ async def schedule_message(event):
     scheduled_messages.remove({"message": message, "time_delay": time_delay})
 
 
-@client.on(events.NewMessage(pattern=r"^\.schedulehelp$", outgoing=True))
+@client.on(events.NewMessage(pattern=r"^\.help_schedulemsg$", outgoing=True))
 async def schedule_help(event):
     """Displays help for the .schedule command."""
     help_message = (
