@@ -50,11 +50,11 @@ async def create_bot():
         await conv.send_message("/newbot")
         await conv.get_response()
 
-        bot_name = "CyberNexus_Bot"
+        bot_name = "CyberNexus Contact Bot"
         await conv.send_message(bot_name)
         await conv.get_response()
 
-        bot_username = "CyberNexus_Bot"
+        bot_username = "{USERNAME}_CyberNexus_Bot"
         await conv.send_message(bot_username)
         response = await conv.get_response()
 
