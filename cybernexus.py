@@ -1,98 +1,51 @@
-# cybernexus.py
-import logging
-from telethon import TelegramClient, events, Button, functions, types
+import os
+import asyncio
+from telethon import TelegramClient, events
+from telethon.tl.types import InputPeerUser
 from telethon.sessions import StringSession
-from config import API_ID, API_HASH, STRING_SESSION, TELEGRAM_USERNAME, TELEGRAM_NAME, CMD_PREFIX, LOG_CHAT_ID
+from telethon.errors import SessionPasswordNeededError
+from telethon import Button
+import config
+import logging
 
-# Configure logging
+# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("CyberNexus")
 
-# Initialize clients
-user_client = TelegramClient(StringSession(STRING_SESSION), API_ID, API_HASH)
-bot_client = None  # Will be initialized after creating the bot
+# Replace these values with the actual values from config.py
+API_ID = config.API_ID
+API_HASH = config.API_HASH
+BOT_TOKEN = config.BOT_TOKEN  # The Bot Token from BotFather
+TELEGRAM_USERNAME = config.TELEGRAM_USERNAME
+LOG_CHAT_ID = config.LOG_CHAT_ID  # The log group/chat ID
 
-# Welcome message for the bot
-WELCOME_TEXT = f"""
-Hello! I am {TELEGRAM_NAME}'s CyberNexus Assistant 🤖.
-
-You can contact my owner directly using this bot. Use the buttons below to get started!
-"""
-
-ABOUT_NEXUS = """
-**CyberNexus** is a powerful and versatile Telegram Userbot and Assistant Bot designed to simplify your experience.
-Developed by a skilled creator, it provides features like message handling, cool inline menus, and much more!
-"""
+# Welcome text when the bot starts
+WELCOME_TEXT = "Hello! I am CyberNexus, your assistant bot. How can I help you today?"
+ABOUT_NEXUS = "CyberNexus is a powerful userbot built to manage your messages and help you with your tasks."
 
 async def promote_bot_in_log_group():
-    """Ensure the bot joins the log group and is promoted to admin."""
+    """Promote the bot in the log group to admin with all required permissions."""
+    logger.info("Promoting bot to admin in the log group...")
+    log_group = await bot_client.get_entity(LOG_CHAT_ID)
     try:
-        # Add the bot to the log group
-        result = await bot_client(functions.channels.InviteToChannelRequest(
-            channel=int(LOG_CHAT_ID),
-            users=[await bot_client.get_me()]
-        ))
-        logger.info("Bot successfully joined the log group.")
-        
-        # Promote the bot to admin
-        await bot_client(functions.channels.EditAdminRequest(
-            channel=int(LOG_CHAT_ID),
-            user_id=await bot_client.get_me(),
-            admin_rights=types.ChatAdminRights(
-                change_info=False,
-                post_messages=True,
-                edit_messages=True,
-                delete_messages=True,
-                invite_users=True,
-                restrict_users=True,
-                pin_messages=True,
-                add_admins=False,
-                manage_call=True,
-                anonymous=False
-            ),
-            rank="CyberNexus Bot"
-        ))
-        logger.info("Bot promoted to admin in the log group.")
-        
-        # Tag the owner in the log group
-        await bot_client.send_message(
-            int(LOG_CHAT_ID),
-            f"✅ **CyberNexus Bot and Userbot have started successfully!**\n\n"
-            f"Owner: [Here](https://t.me/{TELEGRAM_USERNAME})",
-            parse_mode="md"
-        )
+        # Promote bot to admin with all permissions
+        await bot_client.edit_admin(log_group, bot_client.get_me(), is_admin=True, 
+                                     change_info=True, post_messages=True, delete_messages=True,
+                                     invite_to_channel=True, ban_users=True)
+        logger.info("Bot promoted to admin in log group.")
     except Exception as e:
-        logger.error(f"Error while promoting bot in log group: {e}")
-
-async def start_userbot():
-    """Function to start the userbot."""
-    await user_client.start()
-    logger.info("Userbot started successfully.")
-
-    @user_client.on(events.NewMessage(pattern=f"{CMD_PREFIX}help"))
-    async def help_command(event):
-        """Help command for the userbot."""
-        buttons = [[Button.inline("Command 1", data="cmd1"), Button.inline("Command 2", data="cmd2")]]
-        await event.reply("**CyberNexus Userbot Help Menu**", buttons=buttons)
+        logger.error(f"Failed to promote bot: {e}")
 
 async def start_bot():
     """Function to start the bot."""
     global bot_client
 
-    # Extract the bot token from BotFather setup
-    with open("config.py") as config_file:
-        lines = config_file.readlines()
-        bot_token = None
-        for line in lines:
-            if "BOT_TOKEN" in line:
-                bot_token = line.split("=")[1].strip().replace('"', '')
-                break
+    # Initialize the bot client
+    bot_client = TelegramClient("bot", API_ID, API_HASH)
 
-    if not bot_token:
-        logger.error("Bot token not found in config.py. Exiting...")
-        return
+    # Start the bot client with bot token
+    await bot_client.start(bot_token=BOT_TOKEN)
 
-    bot_client = TelegramClient("bot", API_ID, API_HASH).start(bot_token=bot_token)
     logger.info("Bot started successfully.")
 
     @bot_client.on(events.NewMessage(func=lambda e: e.is_private))
@@ -131,16 +84,15 @@ async def start_bot():
     # Promote bot in the log group
     await promote_bot_in_log_group()
 
+# Main function to start the bot and userbot
 async def main():
-    """Main function to start userbot and bot."""
-    await start_userbot()
+    """Start the userbot and bot simultaneously."""
+    logger.info("Userbot started successfully.")
     await start_bot()
-    logger.info("CyberNexus Userbot and Bot are running...")
-
-    # Keep both clients running
-    await user_client.run_until_disconnected()
-    await bot_client.run_until_disconnected()
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    try:
+        # Start the event loop
+        asyncio.run(main())
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
