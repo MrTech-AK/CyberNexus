@@ -10,6 +10,20 @@ afk_status = False
 afk_reason = ""
 afk_trigger_time = 0  # Timestamp of AFK activation
 
+@client.on(events.NewMessage(pattern=r"^\.help_afk$", outgoing=True))
+async def help_afk(event):
+    """Sends a help message explaining how to use the AFK feature."""
+    help_message = (
+        "📚 **AFK Help** 📚\n\n"
+        "Welcome to the **AFK Mode** guide! Here's how to use it:\n\n"
+        "1. **Set yourself as AFK**: Use `.afk` to set your status as away from keyboard.\n"
+        "2. **Set a custom AFK message**: Use `.afk <your message>` to specify a custom message when someone tries to message you while you're away.\n"
+        "3. **Remove AFK status**: Use `.back` to remove the AFK status and let others know you're back!\n\n"
+        "🛑 **Important**: When you're AFK, anyone who messages you will see your AFK message, so let them know you're away!\n\n"
+        "💡 **Pro Tip**: Use a friendly message to let people know you'll reply as soon as you're back! 😎"
+    )
+    await event.edit(help_message)
+    
 @client.on(events.NewMessage(pattern=r"^.afk( .*)?", outgoing=True))
 async def afk(event):
     global afk_status, afk_reason, afk_trigger_time
