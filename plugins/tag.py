@@ -40,6 +40,7 @@ async def tag_command(event):
 
     await event.edit(f"**ᴛᴀɢɢɪɴɢ ᴄᴏᴍᴘᴏɴᴇɴᴛ {tag_type} ɪs ɴᴏᴡ {status}**")
 
+
 @client.on(events.NewMessage(pattern=r"^\.taghelp$", outgoing=True))
 async def tag_help(event):
     """Displays help for the .tag command."""
@@ -54,3 +55,48 @@ async def tag_help(event):
         "ᴄᴏᴍᴍᴀɴᴅs ᴄᴀɴ ʙᴇ ᴇɴᴀʙʟᴇᴅ ᴏʀ ᴅɪsᴀʙʟᴇᴅ ᴏɴᴄᴇ ᴡɪᴛʜ `.tag on` ᴀɴᴅ `.tag off`."
     )
     await event.edit(help_message)
+
+
+@client.on(events.NewMessage(pattern=r"^\.help_tag$", outgoing=True))
+async def help_tag(event):
+    """Displays detailed help for the .tag command."""
+    help_tag_message = (
+        "✵ **ᴅᴇᴛᴀɪʟᴇᴅ ʜᴇʟᴘ ғᴏʀ .ᴛᴀɢ** ✵\n\n"
+        "The `.tag` command allows you to tag users in the group based on different criteria.\n\n"
+        "• `.tag on` – Enables tagging members in the group.\n"
+        "• `.tag off` – Disables tagging.\n"
+        "• `.tag all` – Tags all users in the group (when enabled).\n"
+        "• `.tag bots` – Tags all bots in the group (when enabled).\n"
+        "• `.tag admins` – Tags all admins in the group (when enabled).\n"
+        "• `.tag owner` – Tags the owner of the group (when enabled).\n\n"
+        "Tagging components can be enabled or disabled with `.tag on` and `.tag off` commands."
+    )
+    await event.edit(help_tag_message)
+
+
+async def tag_all_users(event):
+    """Tags all users in the group."""
+    participants = await client.get_participants(event.chat_id)
+    mentions = " ".join([f"[{user.username or user.first_name}](tg://user?id={user.id})" for user in participants])
+    await event.reply(f"**Tagging All Users:**\n{mentions}")
+
+
+async def tag_bots(event):
+    """Tags all bots in the group."""
+    participants = await client.get_participants(event.chat_id, filter=telethon.tl.types.ChannelParticipantsBots)
+    mentions = " ".join([f"[{bot.username or bot.first_name}](tg://user?id={bot.id})" for bot in participants])
+    await event.reply(f"**Tagging Bots:**\n{mentions}")
+
+
+async def tag_admins(event):
+    """Tags all admins in the group."""
+    participants = await client.get_participants(event.chat_id, filter=telethon.tl.types.ChannelParticipantsAdmins)
+    mentions = " ".join([f"[{admin.username or admin.first_name}](tg://user?id={admin.id})" for admin in participants])
+    await event.reply(f"**Tagging Admins:**\n{mentions}")
+
+
+async def tag_owner(event):
+    """Tags the owner of the group."""
+    owner = await client.get_entity(event.chat_id)
+    owner_mention = f"[{owner.username or owner.first_name}](tg://user?id={owner.id})"
+    await event.reply(f"**Tagging Owner:**\n{owner_mention}")
