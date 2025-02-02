@@ -51,11 +51,6 @@ async def main():
 
         console.print("[bold green]🚀 CyberNexus is Running![/bold green]")
 
-        # Start the Contact Bot
-        await asyncio.create_task(run_contact_bot())
-
-        await client.run_until_disconnected()
-
 
 if __name__ == "__main__":
     asyncio.run(main())
