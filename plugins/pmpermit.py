@@ -19,7 +19,7 @@ async def pmpermit_help(event):
         "📚 **PM Permit Help** 📚\n\n"
         "Welcome to CyberNexus! Here's how to interact with me:\n\n"
         "1. **Approve a user**: Use `.a` to approve a user and allow them to send messages freely.\n"
-        "2. **Disapprove a user**: Use `.d` to disapprove a user and restrict them from messaging.\n"
+        "2. **Disapprove a user**: Use `.da` to disapprove a user and restrict them from messaging.\n"
         "3. **Block a user**: Use `.block <user_id>` to block a user from messaging you.\n"
         "4. **Unblock a user**: Use `.unblock <user_id>` to unblock a previously blocked user.\n"
         "5. **List approved users**: Use `.listapproved` to see all approved users.\n"
@@ -43,7 +43,7 @@ async def approve_user(event):
     await event.edit(f"✅ **Approved user:** `{user}`")
 
 # 🚫 Disapprove a User
-@client.on(events.NewMessage(pattern=r"^\.d$", outgoing=True))
+@client.on(events.NewMessage(pattern=r"^\.da$", outgoing=True))
 async def disapprove_user(event):
     """Disapproves a user, making them restricted again."""
     reply = await event.get_reply_message()
