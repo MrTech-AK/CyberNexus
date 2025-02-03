@@ -1,89 +1,93 @@
 import os
+import platform
 import importlib
-import asyncio
 import time
-from telethon import TelegramClient, events
+import random
+import logging
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from telethon import TelegramClient, events, __version__ as telethon_version
 from telethon.sessions import StringSession
 import config  # Import configuration file
-from rich.console import Console
-from rich.progress import track
 
-# Initialize Telegram Client using StringSession
-client = TelegramClient(
-    session=StringSession(config.STRING_SESSION),
-    api_id=config.API_ID,
-    api_hash=config.API_HASH
-)
-
-# Console Styling
+# Initialize Rich Console
 console = Console()
 
-# ASCII Banner
-BANNER = r"""
-.__   __.  __________   ___  __    __       _______.
-|  \ |  | |   ____\  \ /  / |  |  |  |     /       |
-|   \|  | |  |__   \  V  /  |  |  |  |    |   (----`
-|  . `  | |   __|   >   <   |  |  |  |     \   \    
-|  |\   | |  |____ /  .  \  |  `--'  | .----)   |   
-|__| \__| |_______/__/ \__\  \______/  |_______/    
+# Configure Logging
+logging.basicConfig(
+    format="[%(levelname)s] %(message)s",
+    level=logging.INFO
+)
+
+# Cool ASCII Banner
+BANNER = """
+[bold cyan]
+_____   __                          
+___/  | / /________  _____  _________
+__/   |/ /_  _ \_  |/_/  / / /_  ___/
+_/  /|  / /  __/_>  < / /_/ /_(__  ) 
+/_/  |_/  \___//_/|_| \__,_/ /____/  
+[/bold cyan]
 """
 
-# Cool Loading Animation using "rich"
-def loading_screen(task, seconds=2):
-    for _ in track(range(seconds), description=f"[cyan]{task}...[/]"):
-        time.sleep(1)  # ✅ Ensure time.sleep is properly used
+# Display system information
+def display_system_info():
+    os_info = f"{platform.system()} {platform.release()}"
+    python_version = platform.python_version()
+    console.print(f"🌐 [bold green]OS:[/bold green] {os_info}")
+    console.print(f"🐍 [bold green]Python Version:[/bold green] {python_version}")
+    console.print(f"📡 [bold green]Telethon Version:[/bold green] {telethon_version}\n")
 
-# Clear Screen & Display Banner
-try:
-    os.system("clear" if os.name == "posix" else "cls")
-except Exception:
-    pass
+# Fake Loading Steps
+def fake_loading():
+    steps = [
+        "[cyan]🔌 Connecting to Telegram API...",
+        "[cyan]🔒 Verifying CyberNexus Security Modules...",
+        "[cyan]📡 Connecting to Secure Database...",
+        "[cyan]⚙️  Optimizing System Performance...",
+        "[cyan]🛠️  Initializing AI Engine...",
+        "[cyan]📂 Importing CyberNexus Plugins...",
+        "[cyan]🔄 Syncing User Data...",
+        "[cyan]✅ Finalizing Setup..."
+    ]
 
-console.print(f"[bold blue]{BANNER}[/]\n", style="bold green")
-loading_screen("🚀 Hold Tight! Userbot about to Start 🔥")
+    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console) as progress:
+        for step in steps:
+            task = progress.add_task(step, total=1)
+            time.sleep(random.randint(3, 7))  # Random delay (3-7 seconds)
+            progress.update(task, advance=1)
 
-# Initialize Telegram Client using StringSession
+# Initialize Telegram Client
 client = TelegramClient(
     session=StringSession(config.STRING_SESSION),
     api_id=config.API_ID,
     api_hash=config.API_HASH
 )
 
-console.print("\n[bold blue]🔩 Setting Up CyberNexus[/]\n")
-loading_screen("🔩 Setting Up CyberNexus", 5)
-
-console.print("\n[bold blue]🔗 Getting all Plugins[/]\n")
-loading_screen("🔗 Getting all Plugins", 7)
-
-console.print("\n[bold blue]🔄 Starting Assistant[/]\n")
-loading_screen("🔄 Starting Assistant", 4)
-
-console.print("\n[bold blue]🔥 Finalizing Setup[/]\n")
-loading_screen("🔥 Finalizing Setup", 2)
-
-console.print("\n[bold blue]CyberNexus Userbot Online 🚀[/]\n")
-loading_screen("🚀 CyberNexus Userbot Online", 2)
-
-# Start the client
+# Start the bot
 async def start_bot():
-    console.print("[bold green]🔄 Starting CyberNexus Userbot...[/]")
+    console.print(BANNER)
+    display_system_info()
+    fake_loading()
     await client.start()
-    console.print("[bold green]✅ CyberNexus Userbot Started Successfully! 🔥[/]")
+    console.print("[bold green]✅ CyberNexus Userbot is Online![/bold green]")
 
-# Auto-load all plugins from the "plugins" folder
+# Auto-load all plugins from "plugins" folder
 def load_plugins():
     plugins_path = "plugins"
     if not os.path.exists(plugins_path):
         os.makedirs(plugins_path)  # Create folder if not exists
-
+    
     for filename in os.listdir(plugins_path):
         if filename.endswith(".py"):
-            importlib.import_module(f"plugins.{filename[:-3]}")
+            try:
+                importlib.import_module(f"plugins.{filename[:-3]}")
+                console.print(f"🔹 [bold cyan]Loaded Plugin:[/bold cyan] {filename}")
+            except Exception as e:
+                console.print(f"❌ [bold red]Error Loading {filename}:[/bold red] {e}")
 
-async def main():
-    await start_bot()  # ✅ Start inside event loop
-    load_plugins()
-    await client.run_until_disconnected()
-
+# Run the bot
 with client:
-    client.loop.run_until_complete(main())  # ✅ Correct event loop handling
+    client.loop.run_until_complete(start_bot())
+    load_plugins()  # Load all plugins
+    client.run_until_disconnected()
