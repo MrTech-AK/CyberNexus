@@ -94,7 +94,8 @@ async def start_bot():
 # Run the bot
 async def main():
     await client.start()
-    await start_bot()
+    console.print("[bold green]🎯 CyberNexus is now listening for commands![/bold green]")
+
     load_plugins()  # Load all plugins
     await client.run_until_disconnected()
 
