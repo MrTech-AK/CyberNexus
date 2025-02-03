@@ -9,7 +9,7 @@ import platform
 # Global banned users (for demonstration purposes)
 global_banned_users = []
 
-@client.on(events.NewMessage(pattern=r"^\.help$", outgoing=True))
+@client.on(events.NewMessage(pattern=r"^\.help_globaltools$", outgoing=True))
 async def help_menu(event):
     """Display help menu with all available commands."""
     help_text = """
