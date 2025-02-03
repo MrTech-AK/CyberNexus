@@ -52,7 +52,10 @@ if os.path.exists("config.py"):
 # Collect User Inputs
 api_id = get_input("Enter your API ID", is_numeric=True)
 api_hash = get_input("Enter your API HASH")
+username = get_input("Enter your Username with @")
 string_session = get_input("Enter your STRING SESSION")
+owner_id = get_input("Enter your Telegram Owner ID (Your @USERNAME)")
+cmd_hndlr = get_input("Enter your Command Handler (e.g., ! or .)")
 deployer_name = get_input("Enter your Deployer Name")
 
 # Save Configuration
@@ -61,6 +64,9 @@ config_content = f'''# CyberNexus Userbot Configuration
 API_ID = {api_id}
 API_HASH = "{api_hash}"
 STRING_SESSION = "{string_session}"
+USERNAME = "{username}"
+OWNER_ID = {owner_id}
+CMD_HNDLR = "{cmd_hndlr}"
 DEPLOYER_NAME = "{deployer_name}"
 '''
 
