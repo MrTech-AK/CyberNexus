@@ -17,7 +17,7 @@ async def calc(event):
         "To exit the calculator anytime, just type `.exit_calc` 🚪."
     )
 
-    @client.on(events.NewMessage(incoming=True, func=lambda e: e.is_private))
+    @client.on(events.NewMessage(outgoing=True, func=lambda e: e.is_private))
     async def calculate_expression(event):
         """Evaluates the mathematical expression."""
         try:
