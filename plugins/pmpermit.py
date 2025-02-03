@@ -12,7 +12,7 @@ approved_users = set()
 unapproved_counts = {}
 
 # 📚 Help Command
-@client.on(events.NewMessage(pattern=r"^\.pmpermithelp$", outgoing=True))
+@client.on(events.NewMessage(pattern=r"^\.help_pmpermit$", outgoing=True))
 async def pmpermit_help(event):
     """Sends a help message explaining how to get approved and the rules."""
     help_message = (
