@@ -27,6 +27,7 @@ ___/  | / /________  _____  _________
 __/   |/ /_  _ \_  |/_/  / / /_  ___/
 _/  /|  / /  __/_>  < / /_/ /_(__  ) 
 /_/  |_/  \___//_/|_| \__,_/ /____/  
+       [bold green]CyberNexus - The Ultimate Telegram UserBot[/bold green]
 [/bold cyan]
 """
 
@@ -82,10 +83,7 @@ def load_plugins():
         if filename.endswith(".py"):
             try:
                 importlib.import_module(f"plugins.{filename[:-3]}")
-                console.print(f"🔹 [bold cyan]Loaded Plugin:[/bold cyan] {filename}")
-            except Exception as e:
-                console.print(f"❌ [bold red]Error Loading {filename}:[/bold red] {e}")
-
+                
 # Run the bot
 with client:
     client.loop.run_until_complete(start_bot())
