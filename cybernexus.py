@@ -1,14 +1,17 @@
 import os
+import sys
 import platform
 import importlib
-import time
+import asyncio
 import random
 import logging
+import traceback
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
-from telethon import TelegramClient, events, __version__ as telethon_version
+from telethon import TelegramClient, __version__ as telethon_version
 from telethon.sessions import StringSession
 import config  # Import configuration file
+from rich import print 
 
 # Initialize Rich Console
 console = Console()
@@ -20,14 +23,13 @@ logging.basicConfig(
 )
 
 # Cool ASCII Banner
-BANNER = """
+BANNER = r"""
 [bold cyan]
 _____   __                          
 ___/  | / /________  _____  _________
-__/   |/ /_  _ \_  |/_/  / / /_  ___/
+__/   |/ /_  _ \\_  |/_/  / / /_  ___/
 _/  /|  / /  __/_>  < / /_/ /_(__  ) 
-/_/  |_/  \___//_/|_| \__,_/ /____/  
-       [bold green]CyberNexus - The Ultimate Telegram UserBot[/bold green]
+/_/  |_/  \\___//_/|_| \\__,_/ /____/  
 [/bold cyan]
 """
 
@@ -40,7 +42,7 @@ def display_system_info():
     console.print(f"📡 [bold green]Telethon Version:[/bold green] {telethon_version}\n")
 
 # Fake Loading Steps
-def fake_loading():
+async def fake_loading():
     steps = [
         "[cyan]🔌 Connecting to Telegram API...",
         "[cyan]🔒 Verifying CyberNexus Security Modules...",
@@ -55,7 +57,7 @@ def fake_loading():
     with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console) as progress:
         for step in steps:
             task = progress.add_task(step, total=1)
-            time.sleep(random.randint(3, 7))  # Random delay (3-7 seconds)
+            await asyncio.sleep(random.uniform(1.5, 3.0))  # Natural delay (1.5-3 sec)
             progress.update(task, advance=1)
 
 # Initialize Telegram Client
@@ -65,14 +67,6 @@ client = TelegramClient(
     api_hash=config.API_HASH
 )
 
-# Start the bot
-async def start_bot():
-    console.print(BANNER)
-    display_system_info()
-    fake_loading()
-    await client.start()
-    console.print("[bold green]✅ CyberNexus Userbot is Online![/bold green]")
-
 # Auto-load all plugins from "plugins" folder
 def load_plugins():
     plugins_path = "plugins"
@@ -81,11 +75,28 @@ def load_plugins():
     
     for filename in os.listdir(plugins_path):
         if filename.endswith(".py"):
-            try:
-                importlib.import_module(f"plugins.{filename[:-3]}")
-                
+            module_name = f"plugins.{filename[:-3]}"
+            if module_name not in sys.modules:
+                try:
+                    importlib.import_module(module_name)
+                    console.print(f"[bold green]✅ Loaded plugin: {filename}[/bold green]")
+                except Exception as e:
+                    console.print(f"[red]⚠️ Failed to load plugin {filename}[/red]")
+                    console.print(traceback.format_exc())  # Print full error traceback
+
+# Start the bot
+async def start_bot():
+    console.print(BANNER)
+    display_system_info()
+    await fake_loading()
+    console.print("[bold green]✅ CyberNexus Userbot is Online![/bold green]")
+
 # Run the bot
-with client:
-    client.loop.run_until_complete(start_bot())
+async def main():
+    await client.start()
+    await start_bot()
     load_plugins()  # Load all plugins
-    client.run_until_disconnected()
+    await client.run_until_disconnected()
+
+if __name__ == "__main__":
+    asyncio.run(main())
