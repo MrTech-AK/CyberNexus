@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import random
 from rich.console import Console
 from rich.progress import track
 from rich.progress import Progress, SpinnerColumn, TextColumn
