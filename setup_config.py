@@ -20,11 +20,11 @@ BANNER = r"""
 
 BANNER_MAIN = """
 [bold cyan]
-_____   __                          
-___/  | / /________  _____  _________
-__/   |/ /_  _ \_  |/_/  / / /_  ___/
-_/  /|  / /  __/_>  < / /_/ /_(__  ) 
-/_/  |_/  \___//_/|_| \__,_/ /____/  
+  _____   __                          
+  ___/  | / /________  _____  _________
+  __/   |/ / _  _\_  |/_/  / / /_  ___/
+  _/  /|  / /  __/>  < / /_/ /_(__  ) 
+  /_/  |_/ \___//_/|_| \__,_/ /____/  
        [bold green]CyberNexus - The Ultimate Telegram UserBot[/bold green]
 [/bold cyan]
 """
@@ -94,8 +94,6 @@ API_ID = {api_id}
 API_HASH = "{api_hash}"
 STRING_SESSION = "{string_session}"
 USERNAME = "{username}"
-OWNER_ID = {owner_id}
-CMD_HNDLR = "{cmd_hndlr}"
 DEPLOYER_NAME = "{deployer_name}"
 '''
 
