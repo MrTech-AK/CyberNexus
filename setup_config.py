@@ -3,6 +3,7 @@ import sys
 import time
 from rich.console import Console
 from rich.progress import track
+from rich.progress import Progress, SpinnerColumn, TextColumn
 
 # Console Styling
 console = Console()
@@ -17,6 +18,36 @@ BANNER = r"""
 |__| \__| |_______/__/ \__\  \______/  |_______/    
 """
 
+BANNER_MAIN = """
+[bold cyan]
+_____   __                          
+___/  | / /________  _____  _________
+__/   |/ /_  _ \_  |/_/  / / /_  ___/
+_/  /|  / /  __/_>  < / /_/ /_(__  ) 
+/_/  |_/  \___//_/|_| \__,_/ /____/  
+       [bold green]CyberNexus - The Ultimate Telegram UserBot[/bold green]
+[/bold cyan]
+"""
+
+# Fake Loading Steps
+def fake_loading():
+    steps = [
+        "[cyan]🔌 Connecting to Telegram API...",
+        "[cyan]🔒 Verifying CyberNexus Security Modules...",
+        "[cyan]📡 Connecting to Secure Database...",
+        "[cyan]⚙️  Optimizing System Performance...",
+        "[cyan]🛠️  Initializing AI Engine...",
+        "[cyan]📂 Importing CyberNexus Plugins...",
+        "[cyan]🔄 Syncing User Data...",
+        "[cyan]✅ Finalizing Setup..."
+    ]
+
+    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console) as progress:
+        for step in steps:
+            task = progress.add_task(step, total=1)
+            time.sleep(random.randint(3, 7))  # Random delay (3-7 seconds)
+            progress.update(task, advance=1)
+            
 # Cool Loading Animation using "rich"
 def loading_screen(task, seconds=2):
     for _ in track(range(seconds), description=f"[cyan]{task}...[/]"):
@@ -54,8 +85,6 @@ api_id = get_input("Enter your API ID", is_numeric=True)
 api_hash = get_input("Enter your API HASH")
 username = get_input("Enter your Username with @")
 string_session = get_input("Enter your STRING SESSION")
-owner_id = get_input("Enter your Telegram Owner ID (Your @USERNAME)")
-cmd_hndlr = get_input("Enter your Command Handler (e.g., ! or .)")
 deployer_name = get_input("Enter your Deployer Name")
 
 # Save Configuration
@@ -81,9 +110,12 @@ console.print("\n[bold green]✅ Configuration saved successfully in 'config.py'
 start_now = console.input("[bold cyan]🔄 Do you want to start CyberNexus now? (yes/no): [/]").strip().lower()
 
 if start_now in ["yes", "y"]:
-    console.print("\n[bold blue]🔄 Starting CyberNexus Userbot[/]\n")
-    loading_screen("Initializing Userbot", 3)
-    time.sleep(2)  # Small delay before execution
+    # Clear Screen & Display Banner
+    os.system("clear" if os.name == "posix" else "cls")
+    console.print(f"[bold blue]{BANNER_MAIN}[/]\n", style="bold green")
+    console.print("\n[bold blue]🔄 Connecting CyberNexus Userbot[/]\n")
+    fake_loading()
+    loading_screen("Initializing Userbot", 3)  # Small delay before execution
     os.system("python cybernexus.py")
 else:
     console.print("\n[bold yellow]👋 Setup Completed! Start CyberNexus manually using:[/]")
