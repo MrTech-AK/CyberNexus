@@ -1,167 +1,135 @@
-from telethon import events
-from telethon.tl.functions.contacts import BlockRequest, UnblockRequest
-from cybernexus import client
-import json
 import os
+import json
 import config
 import time
 import sys
 import telethon
 import platform
+from telethon import events
+from telethon.tl.functions.contacts import BlockRequest, UnblockRequest
+from cybernexus import client
 
-# File to store approved users
+# 🔹 Storage files
 APPROVED_USERS_FILE = "approved_users.json"
+WARNINGS_FILE = "warnings.json"
 
-# Load approved users from file safely
-def load_approved_users():
-    if os.path.exists(APPROVED_USERS_FILE):
-        try:
-            with open(APPROVED_USERS_FILE, "r") as f:
-                return set(json.load(f))
-        except json.JSONDecodeError:
-            return set()  # If JSON is corrupted, reset it
-    return set()
+# 🔹 Load Approved Users
+if os.path.exists(APPROVED_USERS_FILE):
+    with open(APPROVED_USERS_FILE, "r") as file:
+        APPROVED_USERS = json.load(file)
+else:
+    APPROVED_USERS = []
 
-approved_users = load_approved_users()
-unapproved_counts = {}
+# 🔹 Load Warning Counts
+if os.path.exists(WARNINGS_FILE):
+    with open(WARNINGS_FILE, "r") as file:
+        WARNINGS = json.load(file)
+else:
+    WARNINGS = {}
 
-# Function to save approved users
-def save_approved_users():
-    with open(APPROVED_USERS_FILE, "w") as f:
-        json.dump(list(approved_users), f)
+# 🔹 Auto-reply and warning system
+@client.on(events.NewMessage(incoming=True, func=lambda e: e.is_private and e.sender_id not in APPROVED_USERS))
+async def pm_permit(event):
+    user_id = str(event.sender_id)
 
-# 📚 Help Command
-@client.on(events.NewMessage(pattern=r"^\.help_pmpermit$", outgoing=True))
-async def pmpermit_help(event):
-    """Sends a help message explaining how to get approved and the rules."""
-    help_message = (
-        "📚 **PM Permit Help** 📚\n\n"
-        "Welcome to CyberNexus! Here's how to interact with me:\n\n"
-        "1. **Approve a user**: Use `.a` to approve a user and allow them to send messages freely.\n"
-        "2. **Disapprove a user**: Use `.da` to disapprove a user and restrict them from messaging.\n"
-        "3. **Block a user**: Use `.block <user_id>` to block a user from messaging you.\n"
-        "4. **Unblock a user**: Use `.unblock <user_id>` to unblock a previously blocked user.\n"
-        "5. **List approved users**: Use `.listapproved` to see all approved users.\n"
-        "6. **Unapproved messages**: Any unapproved user can send up to **5 messages** before getting blocked automatically.\n\n"
-        "🛑 **Important**: Spamming isn't cool! 🚫 5 messages = Instant block!\n\n"
-        "💡 **Pro Tip**: Be patient and stay cool—your message is important! 😎"
-    )
-    await event.edit(help_message)
-
-# ✅ Approve a User
-@client.on(events.NewMessage(pattern=r"^\.a$", outgoing=True))
-async def approve_user(event):
-    """Approves a user, allowing them to send messages freely."""
-    reply = await event.get_reply_message()
-    user = reply.sender_id if reply else event.sender_id
-
-    if user in approved_users:
-        return await event.edit("✅ **User is already approved.**")
-
-    approved_users.add(user)
-    save_approved_users()
-    await event.edit(f"✅ **Approved user:** `{user}`")
-
-# 🚫 Disapprove a User
-@client.on(events.NewMessage(pattern=r"^\.da$", outgoing=True))
-async def disapprove_user(event):
-    """Disapproves a user, making them restricted again."""
-    reply = await event.get_reply_message()
-    user = reply.sender_id if reply else event.sender_id
-
-    if user in approved_users:
-        approved_users.remove(user)
-        save_approved_users()
-        await event.edit(f"🚫 **User disapproved:** `{user}`")
-    else:
-        await event.edit("🚫 **User is already unapproved.**")
-
-# 🚫 Block a User
-@client.on(events.NewMessage(pattern=r"^\.block( (.*)|$)", outgoing=True))
-async def block_user(event):
-    """Blocks a user from messaging you."""
-    reply = await event.get_reply_message()
-    user = event.pattern_match.group(2) or (reply.sender_id if reply else None)
-    
-    if not user:
-        return await event.edit("**Reply to a user or specify their ID to block them.**")
-    
-    try:
-        user = int(user)  # Ensure user ID is an integer
-    except ValueError:
-        return await event.edit("❌ **Invalid user ID!**")
-
-    await client(BlockRequest(user))
-    approved_users.discard(user)  # Use discard to avoid KeyError
-    save_approved_users()
-
-    await event.edit(f"🚫 **Blocked user:** `{user}`")
-
-# ✅ Unblock a User
-@client.on(events.NewMessage(pattern=r"^\.unblock( (.*)|$)", outgoing=True))
-async def unblock_user(event):
-    """Unblocks a previously blocked user."""
-    reply = await event.get_reply_message()
-    user = event.pattern_match.group(2) or (reply.sender_id if reply else None)
-    
-    if not user:
-        return await event.edit("**Reply to a user or specify their ID to unblock them.**")
-    
-    try:
-        user = int(user)
-    except ValueError:
-        return await event.edit("❌ **Invalid user ID!**")
-
-    await client(UnblockRequest(user))
-    approved_users.add(user)
-    save_approved_users()
-
-    await event.edit(f"✅ **Unblocked user:** `{user}`")
-
-# 📜 List Approved Users
-@client.on(events.NewMessage(pattern=r"^\.listapproved$", outgoing=True))
-async def list_approved(event):
-    """Lists all approved users."""
-    if not approved_users:
-        return await event.edit("🚫 **No approved users found.**")
-    
-    approved_list = "\n".join(f"• `{user}`" for user in approved_users)
-    await event.edit(f"✅ **Approved users:**\n{approved_list}")
-
-# 🚨 Monitor Unapproved Messages
-@client.on(events.NewMessage(incoming=True, func=lambda e: e.is_private))
-async def monitor_unapproved_messages(event):
-    """Handles messages from unapproved users and blocks spammers."""
-    user = event.sender_id
-
-    # Allow messages from approved users (Fixed issue)
-    if user in approved_users:
+    # Ignore if already blocked
+    if WARNINGS.get(user_id, 0) >= 5:
         return
 
-    # Track the number of messages for unapproved users
-    if user not in unapproved_counts:
-        unapproved_counts[user] = 1
+    # Increment warnings
+    WARNINGS[user_id] = WARNINGS.get(user_id, 0) + 1
+
+    # Save updated warnings
+    with open(WARNINGS_FILE, "w") as file:
+        json.dump(WARNINGS, file)
+
+    # Send warning message
+    warning_no = WARNINGS[user_id]
+    message = f"""
+🌟 **Hey there!** 🌟
+
+You've just connected with **CyberNexus**, the personal assistant of my owner! ✨  
+I'm notifying them right now, so hang tight—your reply is coming soon! 🚀
+
+⚠️ **Warning:** No spamming, please! 🚫 ({warning_no}/5)  
+After **5 messages**, you will be blocked automatically! 😬  
+Keep it chill, and you'll get the attention you deserve! 💬  
+
+💡 **Pro Tip:** Patience pays off, and your message is worth it. 😎  
+
+× **Powered by CyberNexus** 💻
+"""
+    await event.reply(message)
+
+    # Auto-block after 5 warnings
+    if WARNINGS[user_id] >= 5:
+        await client(BlockRequest(event.sender_id))
+        await event.respond("**🚫 You have been blocked due to excessive messaging!**")
+
+# 🔹 Approve user (.ap)
+@client.on(events.NewMessage(pattern=r"^\.ap$", outgoing=True))
+async def approve_user(event):
+    if event.reply_to_msg_id:
+        replied_msg = await event.get_reply_message()
+        user_id = str(replied_msg.sender_id)
+
+        if user_id not in APPROVED_USERS:
+            APPROVED_USERS.append(user_id)
+            with open(APPROVED_USERS_FILE, "w") as file:
+                json.dump(APPROVED_USERS, file)
+
+            WARNINGS.pop(user_id, None)  # Reset warnings
+            with open(WARNINGS_FILE, "w") as file:
+                json.dump(WARNINGS, file)
+
+            await event.reply(f"✅ **User {replied_msg.sender.first_name} has been approved!**")
+        else:
+            await event.reply("✅ **User is already approved.**")
     else:
-        unapproved_counts[user] += 1
+        await event.reply("⚠ **Reply to a message to approve the user!**")
 
-    msg_count = unapproved_counts[user]
+# 🔹 Disapprove user (.da)
+@client.on(events.NewMessage(pattern=r"^\.da$", outgoing=True))
+async def disapprove_user(event):
+    if event.reply_to_msg_id:
+        replied_msg = await event.get_reply_message()
+        user_id = str(replied_msg.sender_id)
 
-    # Send a warning message with a dynamic message count
-    if msg_count <= 5:
-        warning_message = (
-            "🌟 Hey there! 🌟\n\n"
-            "You've just connected with CyberNexus, the personal assistant of my owner! ✨\n"
-            "I'm notifying them right now, so hang tight—your reply is coming soon! 🚀\n\n"
-            f"⚠️ **Warning**: No spamming, please! 🚫 ({msg_count}/5)\n"
-            "After 5 messages, you will be blocked automatically! 😬\n"
-            "Keep it chill, and you'll get the attention you deserve! 💬\n\n"
-            "💡 **Pro Tip**: Patience pays off, and your message is worth it. 😎\n\n"
-            "× Powered by CyberNexus 💻"
-        )
-        await event.respond(warning_message)
+        if user_id in APPROVED_USERS:
+            APPROVED_USERS.remove(user_id)
+            with open(APPROVED_USERS_FILE, "w") as file:
+                json.dump(APPROVED_USERS, file)
 
-    # Block user after 5 unapproved messages
-    if msg_count >= 5:
-        await client(BlockRequest(user))
-        await event.respond("🚫 **You have been blocked due to sending too many unapproved messages.**")
-        del unapproved_counts[user]  # Reset the counter after blocking
+            WARNINGS[user_id] = 0  # Reset warnings
+            with open(WARNINGS_FILE, "w") as file:
+                json.dump(WARNINGS, file)
+
+            await event.reply(f"🚫 **User {replied_msg.sender.first_name} has been disapproved!**")
+        else:
+            await event.reply("⚠ **User is not approved yet.**")
+    else:
+        await event.reply("⚠ **Reply to a message to disapprove the user!**")
+
+# 🔹 Block user (.block)
+@client.on(events.NewMessage(pattern=r"^\.block$", outgoing=True))
+async def block_user(event):
+    if event.reply_to_msg_id:
+        replied_msg = await event.get_reply_message()
+        user_id = replied_msg.sender_id
+
+        await client(BlockRequest(user_id))
+        await event.reply(f"🚫 **User {replied_msg.sender.first_name} has been blocked!**")
+    else:
+        await event.reply("⚠ **Reply to a message to block the user!**")
+
+# 🔹 Unblock user (.unblock)
+@client.on(events.NewMessage(pattern=r"^\.unblock$", outgoing=True))
+async def unblock_user(event):
+    if event.reply_to_msg_id:
+        replied_msg = await event.get_reply_message()
+        user_id = replied_msg.sender_id
+
+        await client(UnblockRequest(user_id))
+        await event.reply(f"✅ **User {replied_msg.sender.first_name} has been unblocked!**")
+    else:
+        await event.reply("⚠ **Reply to a message to unblock the user!**")
