@@ -1,15 +1,34 @@
 from telethon import events
 from telethon.tl.functions.contacts import BlockRequest, UnblockRequest
 from cybernexus import client
+import json
+import os
 import config
 import time
 import sys
 import telethon
 import platform
 
-# Store approved users & unapproved message counts
-approved_users = set()
+# File to store approved users
+APPROVED_USERS_FILE = "approved_users.json"
+
+# Load approved users from file safely
+def load_approved_users():
+    if os.path.exists(APPROVED_USERS_FILE):
+        try:
+            with open(APPROVED_USERS_FILE, "r") as f:
+                return set(json.load(f))
+        except json.JSONDecodeError:
+            return set()  # If JSON is corrupted, reset it
+    return set()
+
+approved_users = load_approved_users()
 unapproved_counts = {}
+
+# Function to save approved users
+def save_approved_users():
+    with open(APPROVED_USERS_FILE, "w") as f:
+        json.dump(list(approved_users), f)
 
 # 📚 Help Command
 @client.on(events.NewMessage(pattern=r"^\.help_pmpermit$", outgoing=True))
@@ -34,12 +53,13 @@ async def pmpermit_help(event):
 async def approve_user(event):
     """Approves a user, allowing them to send messages freely."""
     reply = await event.get_reply_message()
-    user = event.sender_id if not reply else reply.sender_id
+    user = reply.sender_id if reply else event.sender_id
 
     if user in approved_users:
         return await event.edit("✅ **User is already approved.**")
 
     approved_users.add(user)
+    save_approved_users()
     await event.edit(f"✅ **Approved user:** `{user}`")
 
 # 🚫 Disapprove a User
@@ -47,10 +67,11 @@ async def approve_user(event):
 async def disapprove_user(event):
     """Disapproves a user, making them restricted again."""
     reply = await event.get_reply_message()
-    user = event.sender_id if not reply else reply.sender_id
+    user = reply.sender_id if reply else event.sender_id
 
     if user in approved_users:
         approved_users.remove(user)
+        save_approved_users()
         await event.edit(f"🚫 **User disapproved:** `{user}`")
     else:
         await event.edit("🚫 **User is already unapproved.**")
@@ -60,15 +81,20 @@ async def disapprove_user(event):
 async def block_user(event):
     """Blocks a user from messaging you."""
     reply = await event.get_reply_message()
-    user = event.pattern_match.group(1) or (reply.sender_id if reply else None)
+    user = event.pattern_match.group(2) or (reply.sender_id if reply else None)
     
     if not user:
         return await event.edit("**Reply to a user or specify their ID to block them.**")
     
+    try:
+        user = int(user)  # Ensure user ID is an integer
+    except ValueError:
+        return await event.edit("❌ **Invalid user ID!**")
+
     await client(BlockRequest(user))
-    if user in approved_users:
-        approved_users.remove(user)
-    
+    approved_users.discard(user)  # Use discard to avoid KeyError
+    save_approved_users()
+
     await event.edit(f"🚫 **Blocked user:** `{user}`")
 
 # ✅ Unblock a User
@@ -76,13 +102,20 @@ async def block_user(event):
 async def unblock_user(event):
     """Unblocks a previously blocked user."""
     reply = await event.get_reply_message()
-    user = event.pattern_match.group(1) or (reply.sender_id if reply else None)
+    user = event.pattern_match.group(2) or (reply.sender_id if reply else None)
     
     if not user:
         return await event.edit("**Reply to a user or specify their ID to unblock them.**")
     
+    try:
+        user = int(user)
+    except ValueError:
+        return await event.edit("❌ **Invalid user ID!**")
+
     await client(UnblockRequest(user))
     approved_users.add(user)
+    save_approved_users()
+
     await event.edit(f"✅ **Unblocked user:** `{user}`")
 
 # 📜 List Approved Users
@@ -100,13 +133,17 @@ async def list_approved(event):
 async def monitor_unapproved_messages(event):
     """Handles messages from unapproved users and blocks spammers."""
     user = event.sender_id
-    
-    # Allow messages from approved users
+
+    # Allow messages from approved users (Fixed issue)
     if user in approved_users:
         return
-    
-    # Track the number of messages
-    unapproved_counts[user] = unapproved_counts.get(user, 0) + 1
+
+    # Track the number of messages for unapproved users
+    if user not in unapproved_counts:
+        unapproved_counts[user] = 1
+    else:
+        unapproved_counts[user] += 1
+
     msg_count = unapproved_counts[user]
 
     # Send a warning message with a dynamic message count
