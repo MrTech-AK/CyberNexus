@@ -132,16 +132,18 @@ plugin_help = {
     """
 }
 
-@client.on(events.NewMessage(pattern=r"^\.help$", outgoing=True))
-async def help(event):
-    """Send the general help text with a list of plugins."""
-    await event.edit(help_text)
+@client.on(events.NewMessage(pattern=r"^\.help(?:\s+(.+))?$", outgoing=True))
+async def help_command(event):
+    """Send general help or plugin-specific help."""
+    match = event.pattern_match.group(1)  # Capture the plugin name if provided
 
-@client.on(events.NewMessage(pattern=r"^\.help (.*)$", outgoing=True))
-async def plugin_help(event):
-    """Send detailed help text for a specific plugin."""
-    plugin = event.pattern_match.group(1).lower()
+    if not match:  # If no plugin is specified, send general help
+        await event.edit(help_text)
+        return
+
+    plugin = match.lower().strip()  # Normalize the plugin name
+
     if plugin in plugin_help:
         await event.edit(plugin_help[plugin])
     else:
-        await event.edit("**Plugin not found!** Use `.help` to see the available plugins. 😕")
+        await event.edit(f"**Plugin not found!**\nUse `.help` to see available plugins. 😕")
