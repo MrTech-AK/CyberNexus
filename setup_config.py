@@ -34,20 +34,37 @@ BANNER_MAIN = """
 # Fake Loading Steps
 def fake_loading():
     steps = [
-        "[cyan]🔌 Connecting to Telegram API...",
-        "[cyan]🔒 Verifying CyberNexus Security Modules...",
-        "[cyan]📡 Connecting to Secure Database...",
-        "[cyan]⚙️  Optimizing System Performance...",
-        "[cyan]🛠️  Initializing AI Engine...",
-        "[cyan]📂 Importing CyberNexus Plugins...",
-        "[cyan]🔄 Syncing User Data...",
-        "[cyan]✅ Finalizing Setup..."
+    "[cyan]🔌 Connecting to Telegram API",
+    "[cyan]🔒 Verifying CyberNexus Security Modules",
+    "[cyan]📡 Connecting to Secure Database",
+    "[cyan]🛡️ Establishing Secure Encrypted Connection",
+    "[cyan]🔑 Decrypting CyberNexus Credentials",
+    "[cyan]⚙️ Optimizing System Performance",
+    "[cyan]🛠️ Initializing AI Engine",
+    "[cyan]📂 Importing Core CyberNexus Modules",
+    "[cyan]🔍 Scanning for Unauthorized Modifications",
+    "[cyan]🔧 Running System Diagnostics",
+    "[cyan]📡 Syncing User Preferences",
+    "[cyan]🔄 Fetching Latest CyberNexus Updates",
+    "[cyan]📊 Analyzing System Health",
+    "[cyan]💾 Loading Database Cache",
+    "[cyan]🔁 Connecting to Backup Servers",
+    "[cyan]🔗 Establishing Secure API Connections",
+    "[cyan]📡 Calibrating Network Latency",
+    "[cyan]📂 Verifying Plugin Integrity",
+    "[cyan]📜 Loading Configuration Files",
+    "[cyan]🔄 Optimizing Memory Usage",
+    "[cyan]🚀 Bootstrapping CyberNexus Engine",
+    "[cyan]🔍 Enabling Anti-Spam & Security Filters",
+    "[cyan]🛠️ Initializing Command Modules",
+    "[cyan]⚡ Activating Performance Boosters",
+    "[cyan]✅ Finalizing Setup"
     ]
-
+            
     with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console) as progress:
         for step in steps:
             task = progress.add_task(step, total=1)
-            time.sleep(random.randint(3, 7))  # Random delay (3-7 seconds)
+            time.sleep(random.randint(1, 4))  # Random delay (1-4 seconds)
             progress.update(task, advance=1)
             
 # Cool Loading Animation using "rich"
