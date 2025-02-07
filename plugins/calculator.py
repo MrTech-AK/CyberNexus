@@ -74,7 +74,7 @@ def eval_expression(expression):
         for subnode in ast.walk(node):
             if isinstance(subnode, ast.Name) and subnode.id not in allowed_functions:
                 raise ValueError(f"Unsupported function: `{subnode.id}`")
-            elif not isinstance(subnode, (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Num, ast.Load, ast.Call, ast.Attribute)):
+            elif not isinstance(subnode, (ast.Expression, ast.BinOp, ast.UnaryOp, ast.Constant, ast.Load, ast.Call, ast.Attribute)):
                 raise ValueError("Unsupported operation detected!")
 
         return eval(compile(node, "<string>", "eval"), {"__builtins__": {}}, allowed_functions)
