@@ -88,7 +88,7 @@ async def list_approved(event):
     approved_list = "\n".join(f"• `{user}`" for user in approved_users)
     await event.edit(f"✅ **Approved users:**\n{approved_list}")
 
-# 🚨 Monitor Unapproved Messages (No Auto-block)
+# 🚨 Monitor Unapproved Messages (Ignore Bots)
 @client.on(events.NewMessage(incoming=True, func=lambda e: e.is_private))
 async def monitor_unapproved_messages(event):
     global approved_users
@@ -96,17 +96,20 @@ async def monitor_unapproved_messages(event):
 
     user = event.sender_id
 
+    # Ignore messages from bots
+    sender = await event.get_sender()
+    if sender.bot:
+        return  # Do nothing if the sender is a bot
+
     # Allow messages from approved users
     if user in approved_users:
         return
 
     # First-time message response
     warning_message = (
-                   "🌟 Hey there! 🌟\n\n"
-            "You've just connected with CyberNexus, the personal assistant of my owner! ✨\n"
-            "I'm notifying them right now, so hang tight—your reply is coming soon! 🚀\n"
-            "Keep it chill, and you'll get the attention you deserve! 💬\n\n"
-            "× Powered by CyberNexus 💻" 
-    )
-    
+    "🚀 **Hey there!** 🚀\n\n"
+    "You've just connected with **CyberNexus**, my owner's digital assistant! 🤖✨\n"
+    "I'm notifying them right now—so hang tight, and they'll get back to you soon. ⏳\n\n"
+    "⚠️ **Heads up!** Spamming isn't the way to get noticed! 🚫 Keep it cool, and we'll get along just fine. 😎"
+                            )
     await event.respond(warning_message)
