@@ -27,7 +27,7 @@ BANNER_MAIN = """
             _/  /|  / /  __/>  < / /_/ /_(__  ) 
             /_/  |_/ \___//_/|_| \__,_/ /____/  
   
-  [bold green]CyberNexus - The Ultimate Telegram UserBot[/bold green]
+         [bold green]CyberNexus - The Ultimate Telegram UserBot[/bold green]
 [/bold cyan]
 """
 
