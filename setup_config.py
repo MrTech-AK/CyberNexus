@@ -21,12 +21,13 @@ BANNER = r"""
 
 BANNER_MAIN = """
 [bold cyan]
-  _____   __                          
-  ___/  | / /________  _____  _________
-  __/   |/ / _  _\_  |/_/  / / /_  ___/
-  _/  /|  / /  __/>  < / /_/ /_(__  ) 
-  /_/  |_/ \___//_/|_| \__,_/ /____/  
-       [bold green]CyberNexus - The Ultimate Telegram UserBot[/bold green]
+            _____   __                          
+            ___/  | / /________  _____  _________
+            __/   |/ / _  _\_  |/_/  / / /_  ___/
+            _/  /|  / /  __/>  < / /_/ /_(__  ) 
+            /_/  |_/ \___//_/|_| \__,_/ /____/  
+  
+  [bold green]CyberNexus - The Ultimate Telegram UserBot[/bold green]
 [/bold cyan]
 """
 
@@ -114,6 +115,7 @@ if start_now in ["yes", "y"]:
     console.print(f"[bold blue]{BANNER_MAIN}[/]\n", style="bold green")
     console.print("\n[bold blue]🔄 Connecting CyberNexus Userbot[/]\n")
     fake_loading()
+    console.print("")
     loading_screen("Initializing Userbot", 3)  # Small delay before execution
     os.system("python cybernexus.py")
 else:
