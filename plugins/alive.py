@@ -19,4 +19,10 @@ async def alive(event):
         "✵ **Branch:** main ⚙️"
     )
 
-    await event.edit(cyber_alive_text)
+    image_path = "images/CyberNexus_Alive.jpg"
+
+    # Delete the command message
+    await event.delete()
+
+    # Send the image with the Alive text as a caption
+    await client.send_file(event.chat_id, image_path, caption=cyber_alive_text)
