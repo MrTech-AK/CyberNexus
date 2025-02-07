@@ -3,11 +3,6 @@ from telethon.tl.functions.contacts import BlockRequest, UnblockRequest
 from cybernexus import client
 import json
 import os
-import config
-import time
-import sys
-import telethon
-import platform
 
 # File to store approved users
 APPROVED_USERS_FILE = "approved_users.json"
@@ -28,7 +23,6 @@ def save_approved_users():
         json.dump(list(approved_users), f)
 
 approved_users = load_approved_users()
-unapproved_counts = {}
 
 # 📚 Help Command
 @client.on(events.NewMessage(pattern=r"^\.help_pmpermit$", outgoing=True))
@@ -36,43 +30,12 @@ async def pmpermit_help(event):
     help_message = (
         "📚 **PM Permit Help** 📚\n\n"
         "🛑 **Commands:**\n"
-        "✅ `.a` - Approve a user\n"
-        "🚫 `.da` - Disapprove a user\n"
         "🔒 `.block <user_id>` - Block a user\n"
         "🔓 `.unblock <user_id>` - Unblock a user\n"
         "📜 `.listapproved` - List all approved users\n\n"
-        "⚠️ **Warning:** Spamming = Block! 🚫 5 messages = Auto block! 🔥"
+        "⚠️ **Warning:** Spamming = Block! 🚫"
     )
     await event.edit(help_message)
-
-# ✅ Approve a User
-@client.on(events.NewMessage(pattern=r"^\.a$", outgoing=True))
-async def approve_user(event):
-    global approved_users
-    reply = await event.get_reply_message()
-    user = reply.sender_id if reply else event.sender_id
-
-    if user in approved_users:
-        return await event.edit("✅ **User is already approved.**")
-
-    approved_users.add(user)
-    save_approved_users()
-    
-    await event.edit(f"✅ **Approved user:** `{user}`")
-
-# 🚫 Disapprove a User
-@client.on(events.NewMessage(pattern=r"^\.da$", outgoing=True))
-async def disapprove_user(event):
-    global approved_users
-    reply = await event.get_reply_message()
-    user = reply.sender_id if reply else event.sender_id
-
-    if user in approved_users:
-        approved_users.remove(user)
-        save_approved_users()
-        await event.edit(f"🚫 **User disapproved:** `{user}`")
-    else:
-        await event.edit("🚫 **User is already unapproved.**")
 
 # 🚫 Block a User
 @client.on(events.NewMessage(pattern=r"^\.block( (.*)|$)", outgoing=True))
@@ -125,7 +88,7 @@ async def list_approved(event):
     approved_list = "\n".join(f"• `{user}`" for user in approved_users)
     await event.edit(f"✅ **Approved users:**\n{approved_list}")
 
-# 🚨 Monitor Unapproved Messages (Fixes applied)
+# 🚨 Monitor Unapproved Messages (No Auto-block)
 @client.on(events.NewMessage(incoming=True, func=lambda e: e.is_private))
 async def monitor_unapproved_messages(event):
     global approved_users
@@ -137,26 +100,13 @@ async def monitor_unapproved_messages(event):
     if user in approved_users:
         return
 
-    # Track unapproved messages
-    unapproved_counts[user] = unapproved_counts.get(user, 0) + 1
-    msg_count = unapproved_counts[user]
-
-    # First warning message
-    if msg_count == 1:
-        warning_message = (
-            "🌟 **Hello!** 🌟\n\n"
-            "You've reached CyberNexus, my assistant! 🚀\n"
-            "Please wait while I notify them.\n\n"
-            "⚠️ **Note:** Spamming will get you blocked!\n"
-            "You can send up to **5 messages** before an automatic block. ✅"
-        )
-        await event.respond(warning_message)
-
-    # Auto-block after 5 unapproved messages
-    if msg_count >= 5:
-        try:
-            await client(BlockRequest(user))
-            await event.respond("🚫 **You have been blocked due to excessive messaging.**")
-            unapproved_counts.pop(user, None)  # Reset count
-        except Exception:
-            pass  # Avoid crashing if block fails
+    # First-time message response
+    warning_message = (
+                   "🌟 Hey there! 🌟\n\n"
+            "You've just connected with CyberNexus, the personal assistant of my owner! ✨\n"
+            "I'm notifying them right now, so hang tight—your reply is coming soon! 🚀\n"
+            "Keep it chill, and you'll get the attention you deserve! 💬\n\n"
+            "× Powered by CyberNexus 💻" 
+    )
+    
+    await event.respond(warning_message)
