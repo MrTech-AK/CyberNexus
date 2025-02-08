@@ -12,3 +12,9 @@ youtube_dl
 requests
 bs4
 PyDictionary
+speedtest-cli
+subprocess
+urllib3
+pyfiglet
+gTTS  # For Text-to-Speech
+selenium  # For Web Screenshot
