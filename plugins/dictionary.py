@@ -1,54 +1,75 @@
-from PyDictionary import PyDictionary
 from telethon import events
 from cybernexus import client
+import aiohttp
 import platform 
 
-dictionary = PyDictionary()
+API_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
 
-@client.on(events.NewMessage(pattern=r"^\.define (.+)", outgoing=True))
+@client.on(events.NewMessage(pattern=r"^\.define\s+(.+)", outgoing=True))
 async def define_word(event):
     """Fetches the meaning of a word."""
-    word = event.pattern_match.group(1)
+    word = event.pattern_match.group(1).strip()
+
     await event.edit(f"📖 **Searching for:** `{word}`...")
 
-    try:
-        meaning = dictionary.meaning(word)
-        if not meaning:
-            return await event.edit("❌ **No definition found!**")
-        
-        definition = "\n".join(f"• {key}: {', '.join(value)}" for key, value in meaning.items())
-        await event.edit(f"📖 **Word:** `{word}`\n\n{definition}\n\n⚡ Powered by CyberNexus")
-    except Exception as e:
-        await event.edit(f"❌ **Error:** {str(e)}")
+    async with aiohttp.ClientSession() as session:
+        async with session.get(API_URL + word) as response:
+            if response.status != 200:
+                return await event.edit(f"❌ **No definition found for:** `{word}`!")
+
+            data = await response.json()
+            meaning = data[0]["meanings"][0]["definitions"][0]["definition"]
+            example = data[0]["meanings"][0]["definitions"][0].get("example", "No example available.")
+            phonetic = data[0].get("phonetic", "N/A")
+
+            reply = (
+                f"📖 **Word:** `{word}`\n"
+                f"🔊 **Phonetic:** `{phonetic}`\n"
+                f"📚 **Definition:** {meaning}\n"
+                f"💬 **Example:** {example}\n\n"
+                f"⚡ **Powered by CyberNexus**"
+            )
+
+    await event.edit(reply)
 
 
-@client.on(events.NewMessage(pattern=r"^\.syn (.+)", outgoing=True))
+@client.on(events.NewMessage(pattern=r"^\.syn\s+(.+)", outgoing=True))
 async def synonyms(event):
     """Fetches synonyms of a word."""
-    word = event.pattern_match.group(1)
+    word = event.pattern_match.group(1).strip()
+
     await event.edit(f"🔵 **Fetching synonyms for:** `{word}`...")
 
-    try:
-        syns = dictionary.synonym(word)
-        if not syns:
-            return await event.edit("❌ **No synonyms found!**")
-        
-        await event.edit(f"🔵 **Synonyms of `{word}`:**\n{', '.join(syns)}\n\n⚡ Powered by CyberNexus")
-    except Exception as e:
-        await event.edit(f"❌ **Error:** {str(e)}")
+    async with aiohttp.ClientSession() as session:
+        async with session.get(API_URL + word) as response:
+            if response.status != 200:
+                return await event.edit(f"❌ **No synonyms found for:** `{word}`!")
+
+            data = await response.json()
+            syns = data[0]["meanings"][0].get("synonyms", [])
+
+            if not syns:
+                return await event.edit(f"❌ **No synonyms available for:** `{word}`!")
+
+            await event.edit(f"🔵 **Synonyms of `{word}`:**\n`{', '.join(syns[:10])}`\n\n⚡ **Powered by CyberNexus**")
 
 
-@client.on(events.NewMessage(pattern=r"^\.ant (.+)", outgoing=True))
+@client.on(events.NewMessage(pattern=r"^\.ant\s+(.+)", outgoing=True))
 async def antonyms(event):
     """Fetches antonyms of a word."""
-    word = event.pattern_match.group(1)
+    word = event.pattern_match.group(1).strip()
+
     await event.edit(f"🔴 **Fetching antonyms for:** `{word}`...")
 
-    try:
-        ants = dictionary.antonym(word)
-        if not ants:
-            return await event.edit("❌ **No antonyms found!**")
-        
-        await event.edit(f"🔴 **Antonyms of `{word}`:**\n{', '.join(ants)}\n\n⚡ Powered by CyberNexus")
-    except Exception as e:
-        await event.edit(f"❌ **Error:** {str(e)}")
+    async with aiohttp.ClientSession() as session:
+        async with session.get(API_URL + word) as response:
+            if response.status != 200:
+                return await event.edit(f"❌ **No antonyms found for:** `{word}`!")
+
+            data = await response.json()
+            ants = data[0]["meanings"][0].get("antonyms", [])
+
+            if not ants:
+                return await event.edit(f"❌ **No antonyms available for:** `{word}`!")
+
+            await event.edit(f"🔴 **Antonyms of `{word}`:**\n`{', '.join(ants[:10])}`\n\n⚡ **Powered by CyberNexus**")
