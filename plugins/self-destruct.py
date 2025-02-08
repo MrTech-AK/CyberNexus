@@ -1,14 +1,10 @@
 from telethon import events
 from cybernexus import client
-import config
-import time
-import sys
-import telethon
-import platform  # ✅ Fixed import
-
+import asyncio  # ✅ Use asyncio instead of time.sleep()
+import platform 
 
 @client.on(events.NewMessage(pattern=r"^\.selfdestruct$", outgoing=True))
-def self_destruct(event):
+async def self_destruct(event):
     """CyberNexus Self-Destruct Animation"""
 
     self_destruct_steps = [
@@ -37,5 +33,5 @@ def self_destruct(event):
     ]
 
     for step in self_destruct_steps:
-        event.edit(step)
-        time.sleep(1)  # No asyncio, just time.sleep()
+        await event.edit(step)  # ✅ Corrected `await`
+        await asyncio.sleep(1)  # ✅ Replaced `time.sleep()` with `asyncio.sleep()`
