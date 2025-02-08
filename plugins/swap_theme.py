@@ -1,5 +1,6 @@
 from telethon import events
 from cybernexus import client
+import platform
 
 @client.on(events.NewMessage(pattern=r"^\.swaptheme$", outgoing=True))
 async def swap_theme(event):
