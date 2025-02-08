@@ -1,13 +1,8 @@
 from telethon import events
-from cybernexus import client
-import config
-import time
-import sys
-import telethon
 from telethon.tl.functions.users import GetFullUserRequest
 from datetime import datetime
-import platform  # ✅ Fixed import
-
+from cybernexus import client
+import platform 
 
 @client.on(events.NewMessage(pattern=r"^\.info(?:\s+(.+))?$", outgoing=True))
 async def user_info(event):
@@ -21,19 +16,25 @@ async def user_info(event):
     elif input_arg:
         user = await client(GetFullUserRequest(input_arg))
     else:
-        await event.edit("**Reply to a user or provide a username/user ID!**")
-        return
+        return await event.edit("❌ **Reply to a user or provide a username/user ID!**")
 
-    user_info = user.user
+    user_data = user.users[0]  # ✅ Corrected way to access user details
 
-    # Extract details
-    full_name = f"{user_info.first_name or ''} {user_info.last_name or ''}".strip()
-    username = f"@{user_info.username}" if user_info.username else "None"
-    user_id = user_info.id
+    # Extract details safely
+    full_name = f"{user_data.first_name or ''} {user_data.last_name or ''}".strip()
+    username = f"@{user_data.username}" if user_data.username else "None"
+    user_id = user_data.id
     profile_link = f"[Click Here](tg://user?id={user_id})"
-    account_creation_date = datetime.fromtimestamp(user_info.date.timestamp()).strftime("%d %B %Y")
-    status = "Premium User" if user_info.premium else "Regular User"
-    bio = user.about if user.about else "No bio set."
+    
+    # Check last seen (for online status)
+    last_seen = user.full_user.was_online
+    last_seen_text = (
+        datetime.fromtimestamp(last_seen.timestamp()).strftime("%d %B %Y %H:%M") 
+        if last_seen else "Hidden / Private"
+    )
+
+    status = "Premium User" if getattr(user_data, "premium", False) else "Regular User"
+    bio = user.full_user.about if user.full_user.about else "No bio set."
 
     # Format the response
     info_text = (
@@ -42,7 +43,7 @@ async def user_info(event):
         f"🔹 **Username:** {username}\n"
         f"🆔 **User ID:** `{user_id}`\n"
         f"🌍 **Profile Link:** {profile_link}\n"
-        f"🗓 **Account Created:** {account_creation_date}\n"
+        f"🟢 **Last Seen:** {last_seen_text}\n"
         f"🚀 **Status:** {status}\n\n"
         f"📌 **Bio:** {bio}\n\n"
         "⚡ Powered by CyberNexus"
