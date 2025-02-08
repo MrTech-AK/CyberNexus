@@ -1,14 +1,10 @@
 from telethon import events
 from cybernexus import client
-import config
-import time
-import sys
-import telethon
-import platform  # ✅ Fixed import
-
+import asyncio  # ✅ Use asyncio for proper async handling
+import platform 
 
 @client.on(events.NewMessage(pattern=r"^\.timetravel$", outgoing=True))
-def time_travel(event):
+async def time_travel(event):
     """CyberNexus Time Travel Animation"""
 
     travel_steps = [
@@ -29,5 +25,5 @@ def time_travel(event):
     ]
 
     for step in travel_steps:
-        event.edit(step)
-        time.sleep(1)  # No asyncio, just time.sleep()
+        await event.edit(step)  # ✅ Corrected `await`
+        await asyncio.sleep(1)  # ✅ Replaced `time.sleep()` with `asyncio.sleep()`
