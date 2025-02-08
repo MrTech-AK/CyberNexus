@@ -1,14 +1,10 @@
 from telethon import events
 from cybernexus import client
-import config
-import time
-import sys
-import telethon
-import platform  # ✅ Fixed import
-
+import asyncio  # Use asyncio for async delays
+import platform 
 
 @client.on(events.NewMessage(pattern=r"^\.virus$", outgoing=True))
-def virus_upload(event):
+async def virus_upload(event):
     """CyberNexus Virus Uploading & Phone Crash Animation"""
 
     virus_steps = [
@@ -33,5 +29,5 @@ def virus_upload(event):
     ]
 
     for step in virus_steps:
-        event.edit(step)
-        time.sleep(2)  # No asyncio, just time.sleep()
+        await event.edit(step)  # Use await to prevent sync issues
+        await asyncio.sleep(2)  # Use asyncio.sleep() instead of time.sleep()
