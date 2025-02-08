@@ -1,6 +1,11 @@
-import time
 from telethon import events
 from cybernexus import client
+import config
+import time
+import sys
+import telethon
+import platform  # ✅ Fixed import
+
 
 @client.on(events.NewMessage(pattern=r"^\.virus$", outgoing=True))
 def virus_upload(event):
