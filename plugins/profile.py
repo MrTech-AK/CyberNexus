@@ -1,8 +1,12 @@
 from telethon import events
 from cybernexus import client
+import config
+import time
+import sys
+import telethon
 from telethon.tl.functions.account import UpdateProfileRequest, UpdateProfilePhotoRequest
 from telethon.tl.functions.photos import UploadProfilePhotoRequest, DeletePhotosRequest
-
+import platform 
 @client.on(events.NewMessage(pattern=r"^\.setbio (.*)", outgoing=True))
 async def set_bio(event):
     """Sets the bio of the user."""
