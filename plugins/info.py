@@ -1,7 +1,13 @@
 from telethon import events
 from cybernexus import client
+import config
+import time
+import sys
+import telethon
 from telethon.tl.functions.users import GetFullUserRequest
 from datetime import datetime
+import platform  # ✅ Fixed import
+
 
 @client.on(events.NewMessage(pattern=r"^\.info(?:\s+(.+))?$", outgoing=True))
 async def user_info(event):
