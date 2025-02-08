@@ -1,13 +1,10 @@
 from telethon import events
 from cybernexus import client
-import config
-import time
-import sys
-import telethon
-import platform  # ✅ Fixed import
+import platform
+import asyncio  # ✅ Use asyncio instead of time.sleep()
 
 @client.on(events.NewMessage(pattern=r"^\.loading$", outgoing=True))
-def loading_animation(event):
+async def loading_animation(event):
     """CyberNexus Super Extended Loading Effect"""
     
     animation = [
@@ -17,17 +14,16 @@ def loading_animation(event):
         "`Loading [▓▓▓░░░░░░░] 15%`",
         "`Loading [▓▓▓▓░░░░░░] 20%`",
         "`Loading [▓▓▓▓▓░░░░░] 30%`",
-        "`Loading [▓▓▓▓▓▓░░░░] 40%`",
-        "`Loading [▓▓▓▓▓▓▓░░░] 50%`",
-        "`Loading [▓▓▓▓▓▓▓▓░░] 60%`",
-        "`Loading [▓▓▓▓▓▓▓▓▓░] 70%`",
-        "`Loading [▓▓▓▓▓▓▓▓▓▓] 80%`",
-        "`Loading [█████████░] 90%`",
-        "`Loading [██████████] 95%`",
+        "`Loading [▓▓▓▓▓▓▓░░░] 40%`",
+        "`Loading [▓▓▓▓▓▓▓▓░░] 50%`",
+        "`Loading [▓▓▓▓▓▓▓▓▓░] 60%`",
+        "`Loading [▓▓▓▓▓▓▓▓░░░] 70%`",
+        "`Loading [█████████░] 80%`",
+        "`Loading [██████████] 90%`",
         "`Loading Complete... Finalizing`",
         "`✅ Loading Complete!`"
     ]
 
     for frame in animation:
-        event.edit(frame)
-        time.sleep(0.4)
+        await event.edit(frame)  # ✅ Corrected `await`
+        await asyncio.sleep(0.4)  # ✅ Replaced `time.sleep()` with `asyncio.sleep()`
