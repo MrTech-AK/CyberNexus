@@ -9,3 +9,7 @@ qrcode
 pillow
 googletrans==4.0.0-rc1
 yt-dlp
+youtube_dl
+requests
+bs4
+PyDictionary
