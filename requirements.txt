@@ -1,6 +1,5 @@
 telethon
 aiohttp
-random
 sympy
 python-dotenv
 rich
