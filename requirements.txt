@@ -4,3 +4,6 @@ random
 sympy
 python-dotenv
 rich
+psutil
+qrcode
+pillow
