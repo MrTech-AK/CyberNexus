@@ -1,6 +1,7 @@
 from telethon import events
 from cybernexus import client
 import os
+import platform 
 
 @client.on(events.NewMessage(pattern=r"^\.ss (.+)$", outgoing=True))
 async def screenshot(event):
