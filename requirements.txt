@@ -10,10 +10,10 @@ googletrans==4.0.0-rc1
 yt-dlp
 youtube_dl
 requests
-bs4
+beautifulsoup4
 PyDictionary
 speedtest-cli
 urllib3
 pyfiglet
-gTTS  # For Text-to-Speech
-selenium  # For Web Screenshot
+gTTS
+selenium
