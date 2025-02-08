@@ -1,15 +1,12 @@
 from telethon import events
 from cybernexus import client
-import config
 import time
-import sys
-import telethon
-import platform  # ✅ Fixed import
+import platform
 
 @client.on(events.NewMessage(pattern=r"^\.call$", outgoing=True))
 def fake_call(event):
     """Fake Call Animation with Telegram HQ via CyberNexus"""
-    
+
     call_steps = [
         "📡 **Dialing Telegram Secure Line...**",
         "📞 **Initiating Encrypted Connection...**",
@@ -44,8 +41,12 @@ def fake_call(event):
         "👑 **Me:** Haha, anytime bro! Telegram is now 10x better!",
         "🤝 **Pavel:** Thanks, legend! Let’s collab on Telegram AI next time!",
         "📴 **Private Call Disconnected.**",
+        "⚡ **Powered by CyberNexus**"
     ]
 
-    for step in call_steps:
-        event.edit(step)
-        time.sleep(2)  # No asyncio, just time.sleep()
+    def update_step(index):
+        if index < len(call_steps):
+            event.edit(call_steps[index])
+            client.loop.call_later(2, update_step, index + 1)
+
+    update_step(0)  # Start the animation
