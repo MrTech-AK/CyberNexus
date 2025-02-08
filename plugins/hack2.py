@@ -5,10 +5,11 @@ import time
 import sys
 import telethon
 import platform  # ✅ Fixed import
+import asyncio
 
 @client.on(events.NewMessage(pattern=r"^\.hack2$", outgoing=True))
-def fake_hack(event):
-    """CyberNexus Fake Hacking Animation"""
+async def fake_hack(event):
+    """CyberNexus Fake Hacking Animation (Async Version)"""
     
     hack_steps = [
         "💻 **Initializing CyberNexus Hack Engine...**",
@@ -37,5 +38,5 @@ def fake_hack(event):
     ]
 
     for step in hack_steps:
-        event.edit(step)
-        time.sleep(2)  # No asyncio, just time.sleep()
+        await event.edit(step)
+        await asyncio.sleep(2)  # Async sleep
