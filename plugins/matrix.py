@@ -1,14 +1,10 @@
 from telethon import events
 from cybernexus import client
-import config
-import time
-import sys
-import telethon
-import platform  # ✅ Fixed import
-
+import asyncio  # ✅ Use asyncio instead of time.sleep()
+import platform 
 
 @client.on(events.NewMessage(pattern=r"^\.matrix$", outgoing=True))
-def matrix_animation(event):
+async def matrix_animation(event):
     """CyberNexus Extended Matrix Effect"""
     
     animation = [
@@ -31,5 +27,5 @@ def matrix_animation(event):
     ]
 
     for frame in animation:
-        event.edit(frame)
-        time.sleep(0.3)
+        await event.edit(frame)  # ✅ Corrected `await`
+        await asyncio.sleep(0.3)  # ✅ Replaced `time.sleep()` with `asyncio.sleep()`
