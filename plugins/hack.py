@@ -5,14 +5,16 @@ import time
 import sys
 import telethon
 import platform  # ✅ Fixed import
+import asyncio
 
 @client.on(events.NewMessage(pattern=r"^\.hack(?: |$)(.*)", outgoing=True))
-def hack(event):
-    """Ultimate Fake Hacking Animation (No Async)"""
+async def hack(event):
+    """Ultimate Fake Hacking Animation (Async & Optimized)"""
+    
     target = event.pattern_match.group(1) or "Target"
 
     animation = [
-        f"🔍 Searching for {target}'s credentials...",
+        f"🔍 Searching for `{target}`'s credentials...",
         "🔗 Establishing a secure connection to Dark Web...",
         "🟢 Connection established!",
         "📡 Connecting to Telegram servers...",
@@ -46,5 +48,5 @@ def hack(event):
     ]
 
     for msg in animation:
-        event.edit(msg)
-        time.sleep(2)  # Normal sleep instead of asyncio
+        await event.edit(msg)
+        await asyncio.sleep(2)  # Proper async sleep
