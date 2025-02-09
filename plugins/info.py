@@ -42,10 +42,7 @@ async def user_info(event):
         f"👤 **Full Name:** {full_name}\n"
         f"🔹 **Username:** {username}\n"
         f"🆔 **User ID:** `{user_id}`\n"
-        f"🌍 **Profile Link:** {profile_link}\n"
-        f"🟢 **Last Seen:** {last_seen_text}\n"
-        f"🚀 **Status:** {status}\n\n"
-        f"📌 **Bio:** {bio}\n\n"
+        f"🌍 **Profile Link:** {profile_link}\n\n"
         "⚡ Powered by CyberNexus"
     )
 
