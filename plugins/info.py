@@ -26,16 +26,6 @@ async def user_info(event):
     user_id = user_data.id
     profile_link = f"[Click Here](tg://user?id={user_id})"
     
-    # Check last seen (for online status)
-    last_seen = user.full_user.was_online
-    last_seen_text = (
-        datetime.fromtimestamp(last_seen.timestamp()).strftime("%d %B %Y %H:%M") 
-        if last_seen else "Hidden / Private"
-    )
-
-    status = "Premium User" if getattr(user_data, "premium", False) else "Regular User"
-    bio = user.full_user.about if user.full_user.about else "No bio set."
-
     # Format the response
     info_text = (
         "✨ **User Info** ✨\n\n"
