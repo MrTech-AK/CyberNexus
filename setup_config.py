@@ -105,6 +105,8 @@ api_hash = get_input("Enter your API HASH")
 username = get_input("Enter your Username with @")
 string_session = get_input("Enter your STRING SESSION")
 deployer_name = get_input("Enter your Deployer Name")
+bot_token = get_input("Enter Bot Token")
+contact_bot_groups = get_input("Enter Log Group Id")
 
 # Save Configuration
 config_content = f'''# CyberNexus Userbot Configuration
@@ -114,6 +116,10 @@ API_HASH = "{api_hash}"
 STRING_SESSION = "{string_session}"
 USERNAME = "{username}"
 DEPLOYER_NAME = "{deployer_name}"
+BOT_TOKEN = "{bot_token}"
+CONTACT_BOT_GROUPS = "{contact_bot_groups}"
+BLOCKED_KEYWORDS = ["spam", "scam", "hack"]
+BLOCKED_TYPES = ["gif", "sticker"]
 '''
 
 with open("config.py", "w") as config_file:
