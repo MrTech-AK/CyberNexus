@@ -21,7 +21,7 @@ async def start_userbot():
     print("✅ CyberNexus Userbot is Online!")
 
 # Auto-load all userbot plugins from "plugins" folder
-async def load_plugins():
+def load_plugins():
     plugins_path = "plugins"
     if not os.path.exists(plugins_path):
         os.makedirs(plugins_path)
@@ -30,12 +30,16 @@ async def load_plugins():
         if filename.endswith(".py"):
             importlib.import_module(f"plugins.{filename[:-3]}")
 
-# Run both bots asynchronously
+# Run both bots in an event loop
 async def main():
     await start_userbot()
-    await load_plugins()
+    load_plugins()  # Load all plugins for Userbot
     print("✅ CyberNexus Contact Bot is Online!")
     await asyncio.gather(client.run_until_disconnected(), bot.run_until_disconnected())
 
-# Start the event loop properly
-asyncio.run(main())
+# Handle event loop properly in Termux & other environments
+loop = asyncio.get_event_loop()
+if loop.is_running():
+    loop.create_task(main())  # If the loop is already running, schedule the task
+else:
+    loop.run_until_complete(main())  # If the loop is not running, start it normally
