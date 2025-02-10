@@ -5,15 +5,16 @@ from telethon import TelegramClient, events
 from telethon.sessions import StringSession
 import config  # Import configuration file
 
-# Initialize CyberNexus Userbot
+# Initialize CyberNexus Userbot (Using StringSession)
 client = TelegramClient(
     session=StringSession(config.STRING_SESSION),
     api_id=config.API_ID,
     api_hash=config.API_HASH
 )
 
-# Initialize Contact Bot (Create client instance first)
-bot = TelegramClient("CyberNexus_ContactBot", config.API_ID, config.API_HASH)
+# Initialize Contact Bot with a separate session file
+bot_session_file = "contact_bot_session.session"
+bot = TelegramClient(bot_session_file, config.API_ID, config.API_HASH)
 
 # Start the Userbot
 async def start_userbot():
