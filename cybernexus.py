@@ -12,13 +12,18 @@ client = TelegramClient(
     api_hash=config.API_HASH
 )
 
-# Initialize Contact Bot
-bot = TelegramClient("CyberNexus_ContactBot", config.API_ID, config.API_HASH).start(bot_token=config.BOT_TOKEN)
+# Initialize Contact Bot (Create client instance first)
+bot = TelegramClient("CyberNexus_ContactBot", config.API_ID, config.API_HASH)
 
 # Start the Userbot
 async def start_userbot():
     await client.start()
     print("✅ CyberNexus Userbot is Online!")
+
+# Start the Contact Bot
+async def start_contact_bot():
+    await bot.start(bot_token=config.BOT_TOKEN)
+    print("✅ CyberNexus Contact Bot is Online!")
 
 # Auto-load all userbot plugins from "plugins" folder
 def load_plugins():
@@ -33,8 +38,9 @@ def load_plugins():
 # Run both bots in an event loop
 async def main():
     await start_userbot()
+    await start_contact_bot()
     load_plugins()  # Load all plugins for Userbot
-    print("✅ CyberNexus Contact Bot is Online!")
+    print("🚀 Both CyberNexus Userbot & Contact Bot are Running!")
     await asyncio.gather(client.run_until_disconnected(), bot.run_until_disconnected())
 
 # Handle event loop properly in Termux & other environments
