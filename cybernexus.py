@@ -21,20 +21,21 @@ async def start_userbot():
     print("✅ CyberNexus Userbot is Online!")
 
 # Auto-load all userbot plugins from "plugins" folder
-def load_plugins():
+async def load_plugins():
     plugins_path = "plugins"
     if not os.path.exists(plugins_path):
         os.makedirs(plugins_path)
+
     for filename in os.listdir(plugins_path):
         if filename.endswith(".py"):
             importlib.import_module(f"plugins.{filename[:-3]}")
 
-# Run both bots
+# Run both bots asynchronously
 async def main():
     await start_userbot()
+    await load_plugins()
     print("✅ CyberNexus Contact Bot is Online!")
-    load_plugins()  # Load all plugins for Userbot
     await asyncio.gather(client.run_until_disconnected(), bot.run_until_disconnected())
 
-with client, bot:
-    client.loop.run_until_complete(main())
+# Start the event loop properly
+asyncio.run(main())
