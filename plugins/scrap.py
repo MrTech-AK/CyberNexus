@@ -39,7 +39,7 @@ async def scrape_and_add(event):
             try:
                 await client(InviteToChannelRequest(to_entity, [user.id]))
                 added_count += 1
-                await asyncio.sleep(5)  # Prevent rate limits
+                await asyncio.sleep(15)  # Prevent rate limits
             except UserPrivacyRestrictedError:
                 failed_count += 1  # Skipping users with private settings
             except ChatAdminRequiredError:
